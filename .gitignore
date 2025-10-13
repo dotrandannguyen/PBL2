@@ -1,0 +1,17 @@
+# Thư mục cấu hình VSCode
+.vscode/
+
+# Thư mục chứa header và thư viện
+include/
+lib/
+
+# File biên dịch sinh ra
+*.exe
+*.o
+*.obj
+*.dll
+*.a
+*.lib
+
+# File tạm
+*.log
