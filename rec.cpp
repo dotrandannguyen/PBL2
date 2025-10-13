@@ -8,7 +8,10 @@ void drawCircle(SDL_Renderer *renderer, int cx, int cy, int radius)
     int x = radius - 1;
     int y = 0;
     int dx = 1;
-    int dy = 1;
+    int d = 1;
+
+
+
     int err = dx - (radius << 1);
 
     while (x >= y)
