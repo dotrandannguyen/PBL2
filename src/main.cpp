@@ -4,8 +4,13 @@
 #include <string>
 #include <vector>
 #include "D:\Drone-project\src\render\Renderer.h"
+#include "D:\Drone-project\src\core\Drone.h"
+#include "D:\Drone-project\src\render\Page\HomePage.h"
+#include "D:\Drone-project\src\render\Page\DronePage.h"
 
 using namespace std;
+
+bool isAddingDrone = false;
 
 struct Button
 {
@@ -14,18 +19,10 @@ struct Button
     bool selected;
 };
 
-void renderText(SDL_Renderer *renderer, TTF_Font *font, const string &text, int x, int y, SDL_Color color)
-{
-    SDL_Surface *surface = TTF_RenderText_Solid(font, text.c_str(), color);
-    SDL_Texture *texture = SDL_CreateTextureFromSurface(renderer, surface);
-    SDL_Rect dst = {x, y, surface->w, surface->h};
-    SDL_RenderCopy(renderer, texture, NULL, &dst);
-    SDL_FreeSurface(surface);
-    SDL_DestroyTexture(texture);
-}
-
 int main(int argc, char *argv[])
 {
+    vector<Drone> drones = readDronesFromFile("D:/Drone-project/src/data/Drone.txt");
+
     if (SDL_Init(SDL_INIT_VIDEO) < 0)
     {
         cout << "SDL could not initialize! " << SDL_GetError() << "\n";
@@ -38,10 +35,16 @@ int main(int argc, char *argv[])
         return 1;
     }
 
+    SDL_DisplayMode DM;
+    SDL_GetCurrentDisplayMode(0, &DM);
+    int screenWidth = DM.w;
+    int screenHeight = DM.h;
+
     SDL_Window *window = SDL_CreateWindow("Dashboard - SDL2",
                                           SDL_WINDOWPOS_CENTERED,
                                           SDL_WINDOWPOS_CENTERED,
-                                          1280, 720,
+                                          screenWidth,
+                                          screenHeight,
                                           SDL_WINDOW_SHOWN | SDL_WINDOW_RESIZABLE);
     SDL_Renderer *renderer = SDL_CreateRenderer(window, -1, SDL_RENDERER_ACCELERATED);
 
@@ -51,29 +54,37 @@ int main(int argc, char *argv[])
     SDL_Color selectedColor = {255, 174, 66, 255};
 
     TTF_Font *font = TTF_OpenFont("C:/Windows/Fonts/segoeui.ttf", 22);
+    TTF_Font *fontSmall = TTF_OpenFont("C:/Windows/Fonts/segoeui.ttf", 12);
     if (!font)
     {
         cout << "Không tìm thấy font!\n";
         return 1;
     }
 
+    // Sidebar width chiếm 15% màn hình
+    int sidebarWidth = static_cast<int>(screenWidth * 0.15);
+    int sidebarMargin = 10; // Khoảng cách nút 3 gạch
+
+    // Các nút sidebar tính theo tỷ lệ màn hình
     vector<Button> buttons = {
-        {{0, 100, 190, 50}, "Home", true},
-        {{0, 160, 190, 50}, "Drone", false},
-        {{0, 220, 190, 50}, "Task", false},
-        {{0, 280, 190, 50}, "Notification", false},
-        {{0, 340, 190, 50}, "Order", false},
-        {{0, 400, 190, 50}, "Graph", false}};
+        {{0, static_cast<int>(screenHeight * 0.15), sidebarWidth, static_cast<int>(screenHeight * 0.06)}, "Home", true},
+        {{0, static_cast<int>(screenHeight * 0.23), sidebarWidth, static_cast<int>(screenHeight * 0.06)}, "Drone", false},
+        {{0, static_cast<int>(screenHeight * 0.31), sidebarWidth, static_cast<int>(screenHeight * 0.06)}, "Task", false},
+        {{0, static_cast<int>(screenHeight * 0.39), sidebarWidth, static_cast<int>(screenHeight * 0.06)}, "Notification", false},
+        {{0, static_cast<int>(screenHeight * 0.47), sidebarWidth, static_cast<int>(screenHeight * 0.06)}, "Order", false},
+        {{0, static_cast<int>(screenHeight * 0.55), sidebarWidth, static_cast<int>(screenHeight * 0.06)}, "Graph", false}};
 
     string currentPage = "Home";
 
     bool quit = false;
     bool sidebarVisible = true;
-    int sidebarWidth = 200; // Chiều rộng sidebar
+
     SDL_Event e;
 
     while (!quit)
     {
+        int menuX = sidebarVisible ? sidebarWidth + sidebarMargin : sidebarMargin;
+        SDL_Rect menuBtn = {menuX, 20, 50, 40};
         while (SDL_PollEvent(&e))
         {
             if (e.type == SDL_QUIT)
@@ -84,11 +95,10 @@ int main(int argc, char *argv[])
                 int my = e.button.y;
 
                 //  Nút 3 gạch — luôn nằm sát mép sidebar
-                SDL_Rect menuBtn = {sidebarWidth + 10, 20, 50, 40};
+
                 if (isMouseInside(menuBtn, mx, my))
                 {
                     sidebarVisible = !sidebarVisible;
-                    sidebarWidth = sidebarVisible ? 200 : 0; // Toggle width
                 }
 
                 // Nếu sidebar đang hiển thị, xử lý click các nút
@@ -105,6 +115,18 @@ int main(int argc, char *argv[])
                         }
                     }
                 }
+                // Xử lý click trang Home
+                if (currentPage == "Home")
+                {
+                    if (isAddingDrone)
+                    {
+                        handleAddDroneClick(mx, my, drones);
+                    }
+                    else
+                    {
+                        handleHomePageClick(renderer, mx, my, drones);
+                    }
+                }
             }
         }
 
@@ -115,25 +137,26 @@ int main(int argc, char *argv[])
         //  Sidebar
         if (sidebarVisible)
         {
+            SDL_Rect sidebar = {0, 0, sidebarWidth, screenHeight};
             SDL_SetRenderDrawColor(renderer, sidebarColor.r, sidebarColor.g, sidebarColor.b, 255);
-            SDL_Rect sidebar = {0, 0, sidebarWidth - 10, 720}; // Chừa 10px cho nút
             SDL_RenderFillRect(renderer, &sidebar);
 
             // Các nút sidebar
             for (auto &btn : buttons)
             {
+                SDL_Rect btnRect = btn.rect; // Xử lý btnRect.x = 0
                 if (btn.selected)
                     SDL_SetRenderDrawColor(renderer, selectedColor.r, selectedColor.g, selectedColor.b, 255);
                 else
                     SDL_SetRenderDrawColor(renderer, sidebarColor.r, sidebarColor.g, sidebarColor.b, 255);
 
-                SDL_RenderFillRect(renderer, &btn.rect);
-                renderText(renderer, font, btn.label, 30, btn.rect.y + 10, textColor);
+                SDL_RenderFillRect(renderer, &btnRect);
+                renderText(renderer, font, btn.label, btnRect.x + 20, btnRect.y + 10, textColor);
             }
         }
 
-        //  Nút 3 gạch — luôn ở cạnh sidebar
-        SDL_Rect menuBtn = {sidebarWidth + 10, 20, 50, 40};
+        // Nút 3 gạch — luôn ở cạnh sidebar
+
         SDL_SetRenderDrawColor(renderer, 50, 50, 50, 255);
         for (int i = 0; i < 3; i++)
         {
@@ -142,8 +165,12 @@ int main(int argc, char *argv[])
         }
 
         // Nội dung trang
-        int contentX = sidebarVisible ? 600 : 300;
-        renderText(renderer, font, "Page: " + currentPage, contentX, 350, {0, 0, 0, 255});
+        int contentX = sidebarVisible ? sidebarWidth + 20 : 20;
+
+        if (currentPage == "Home")
+            renderHomePage(renderer, fontSmall, drones);
+        else if (currentPage == "Drone")
+            renderDronePage(renderer, font, drones, contentX);
 
         SDL_RenderPresent(renderer);
     }
