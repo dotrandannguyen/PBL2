@@ -5,8 +5,8 @@
 #include <SDL2/SDL_ttf.h>
 #include <vector>
 #include <string>
-#include "D:/Drone-project/src/core/Drone.h"
-#include "D:\Drone-project\src\render\Renderer.h"
+#include "../../core/Drone.h"
+#include "../Renderer.h"
 
 extern bool isAddingDrone;
 

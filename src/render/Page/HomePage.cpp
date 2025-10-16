@@ -1,5 +1,4 @@
 #include "HomePage.h"
-#include "D:\Drone-project\src\core\Drone.h"
 
 SDL_Point getDronePosXY(const string &pos)
 {

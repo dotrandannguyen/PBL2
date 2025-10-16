@@ -1,5 +1,5 @@
 #include "DronePage.h"
-#include "D:/Drone-project/src/render/Renderer.h"
+
 #include <iomanip>
 #include <sstream>
 

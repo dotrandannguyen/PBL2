@@ -3,11 +3,10 @@
 #include <iostream>
 #include <string>
 #include <vector>
-#include "D:\Drone-project\src\render\Renderer.h"
-#include "D:\Drone-project\src\core\Drone.h"
-#include "D:\Drone-project\src\render\Page\HomePage.h"
-#include "D:\Drone-project\src\render\Page\DronePage.h"
-
+#include "render/Renderer.h"
+#include "core/Drone.h"
+#include "render/Page/HomePage.h"
+#include "render/Page/DronePage.h"
 using namespace std;
 
 bool isAddingDrone = false;
