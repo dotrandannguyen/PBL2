@@ -1,0 +1,1 @@
+g++ -std=c++17 -ID:/Drone-project/include -LD:/Drone-project/lib D:\Drone-project\src\main.cpp -lmingw32 -lSDL2main -lSDL2 -lSDL2_ttf -o main 

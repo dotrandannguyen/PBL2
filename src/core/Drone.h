@@ -2,6 +2,7 @@
 #define DRONE_H
 
 #include <string>
+#include <vector>
 using namespace std;
 
 class Drone
@@ -34,5 +35,8 @@ public:
     void setBattery(int battery);
     void setStatus(const string &status);
 };
+
+vector<Drone> readDronesFromFile(const string &filename);
+void writeDronesToFile(const string &filename, const vector<Drone> &drones);
 
 #endif
