@@ -2,6 +2,8 @@
 #pragma once
 #include <string>
 #include <vector>
+#include <cmath>
+#include "Node.h"
 using namespace std;
 
 class Drone
@@ -13,6 +15,10 @@ private:
     float Speed;
     int Battery;
     string Status;
+
+    // thêm biến phục vụ di chuyển
+    vector<Node> path;
+    int currentTargetIndex = 0;
 
 public:
     Drone(string id = "", string name = "", float x = 0, float y = 0,
@@ -34,6 +40,9 @@ public:
     void setSpeed(float speed);
     void setBattery(int battery);
     void setStatus(const string &status);
+
+    void setPath(const vector<Node> &nodes);
+    bool updateMove(float deltaTime);
 };
 vector<Drone> readDronesFromFile(const string &filename);
 void writeDronesToFile(const string &filename, const vector<Drone> &drones);

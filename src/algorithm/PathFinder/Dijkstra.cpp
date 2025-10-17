@@ -15,8 +15,17 @@ AdjList buildAdjacencyList(const vector<Edge> &edges)
     return adj;
 }
 
-vector<string> dijkstra(const AdjList &adj, const string &start, const string &end)
+vector<string> dijkstra(const string &start, const string &end)
 {
+    vector<Edge> edges = readEdgesFromFile("D:/Drone-project/src/data/Edge.txt");
+    if (edges.empty())
+    {
+        cerr << "Không thể đọc dữ liệu cạnh từ file.\n";
+        return {};
+    }
+
+    AdjList adj = buildAdjacencyList(edges);
+
     unordered_map<string, float> dist;                                                                 // dist[nodeid] = khoang cach tu start -> nodeid
     unordered_map<string, string> prev;                                                                // lu duong di ngan nhat theo dang N1 -> N2
     priority_queue<pair<float, string>, vector<pair<float, string>>, greater<pair<float, string>>> pq; // {khoang cach, nodeid}

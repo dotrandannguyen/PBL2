@@ -53,6 +53,49 @@ vector<Drone> readDronesFromFile(const string &filename)
     return drones;
 }
 
+void Drone::setPath(const vector<Node> &nodes)
+{
+    path = nodes;
+    currentTargetIndex = 0;
+    if (!path.empty())
+    {
+        setPosition(path[0].getX(), path[0].getY());
+        setStatus("moving");
+    }
+}
+
+// Hàm updateMove(deltaTime)
+bool Drone::updateMove(float deltaTime)
+{
+    if (Status != "moving" || path.empty() || currentTargetIndex >= (int)path.size())
+        return false;
+
+    Node target = path[currentTargetIndex];
+    float dx = target.getX() - X;
+    float dy = target.getY() - Y;
+    float dist = sqrt(dx * dx + dy * dy);
+
+    if (dist < 1.0f)
+    {
+        currentTargetIndex++;
+        if (currentTargetIndex >= (int)path.size())
+        {
+            setStatus("idle");
+            return false; // hết đường
+        }
+        target = path[currentTargetIndex];
+        dx = target.getX() - X;
+        dy = target.getY() - Y;
+        dist = sqrt(dx * dx + dy * dy);
+    }
+
+    // Tính bước di chuyển (Speed pixel/s)
+    float step = Speed * deltaTime;
+    X += step * (dx / dist);
+    Y += step * (dy / dist);
+    return true;
+}
+
 // Ghi file
 void writeDronesToFile(const string &filename, const vector<Drone> &drones)
 {

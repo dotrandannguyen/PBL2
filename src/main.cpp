@@ -3,10 +3,12 @@
 #include <iostream>
 #include <string>
 #include <vector>
+#include <chrono>
 #include "render/Renderer.h"
 #include "core/Drone.h"
 #include "render/Page/HomePage.h"
 #include "render/Page/DronePage.h"
+#include "algorithm/PathFinder/Dijkstra.h"
 using namespace std;
 
 bool isAddingDrone = false;
@@ -80,7 +82,8 @@ int main(int argc, char *argv[])
 
     bool quit = false;
     bool sidebarVisible = true;
-
+    bool isMoving = false;
+    auto lastTime = chrono::high_resolution_clock::now();
     SDL_Event e;
 
     while (!quit)
@@ -138,6 +141,22 @@ int main(int argc, char *argv[])
                     }
                 }
             }
+            else if (e.key.keysym.sym == SDLK_SPACE)
+            {
+                if (!isMoving)
+                {
+                    isMoving = true;
+                    vector<string> pathIDs = dijkstra("N01", "N05");
+                    vector<Node> pathNodes;
+                    for (const string &id : pathIDs)
+                        for (const Node &n : nodes)
+                            if (n.getNodeID() == id)
+                                pathNodes.push_back(n);
+
+                    drones[0].setPath(pathNodes);
+                    drones[0].setStatus("moving");
+                }
+            }
         }
 
         // Vẽ nền
@@ -178,7 +197,20 @@ int main(int argc, char *argv[])
         int contentX = sidebarVisible ? sidebarWidth + 20 : 20;
 
         if (currentPage == "Home")
+        {
             renderHomePage(renderer, fontSmall, drones, nodes, edges);
+
+            if (isMoving)
+            {
+                auto currentTime = chrono::high_resolution_clock::now();
+
+                float deltaTime = chrono::duration<float>(currentTime - lastTime).count();
+                lastTime = currentTime;
+
+                drones[0].updateMove(deltaTime);
+            }
+        }
+
         else if (currentPage == "Drone")
             renderDronePage(renderer, font, drones, contentX);
 
