@@ -10,6 +10,7 @@
 using namespace std;
 
 bool isAddingDrone = false;
+bool isAddingNode = false;
 
 struct Button
 {
@@ -21,6 +22,8 @@ struct Button
 int main(int argc, char *argv[])
 {
     vector<Drone> drones = readDronesFromFile("D:/Drone-project/src/data/Drone.txt");
+    vector<Node> nodes = readNodesFromFile("D:/Drone-project/src/data/Node.txt");
+    vector<Edge> edges = readEdgesFromFile("D:/Drone-project/src/data/Edge.txt");
 
     if (SDL_Init(SDL_INIT_VIDEO) < 0)
     {
@@ -123,7 +126,15 @@ int main(int argc, char *argv[])
                     }
                     else
                     {
-                        handleHomePageClick(renderer, mx, my, drones);
+                        handleHomePageDroneClick(renderer, mx, my);
+                    }
+                    if (isAddingNode)
+                    {
+                        handleAddNodeClick(mx, my, nodes, edges);
+                    }
+                    else
+                    {
+                        handleHomePageNodeClick(renderer, mx, my);
                     }
                 }
             }
@@ -167,7 +178,7 @@ int main(int argc, char *argv[])
         int contentX = sidebarVisible ? sidebarWidth + 20 : 20;
 
         if (currentPage == "Home")
-            renderHomePage(renderer, fontSmall, drones);
+            renderHomePage(renderer, fontSmall, drones, nodes, edges);
         else if (currentPage == "Drone")
             renderDronePage(renderer, font, drones, contentX);
 

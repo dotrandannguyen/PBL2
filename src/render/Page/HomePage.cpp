@@ -14,7 +14,7 @@ SDL_Point getDronePosXY(const string &pos)
     return {baseX + 100, baseY + 100};
 }
 
-void renderHomePage(SDL_Renderer *renderer, TTF_Font *fontSmall, const std::vector<Drone> &drones)
+void renderHomePage(SDL_Renderer *renderer, TTF_Font *fontSmall, const std::vector<Drone> &drones, const std::vector<Node> &nodes, const std::vector<Edge> &edges)
 {
     SDL_Color textColor = {0, 0, 0, 255};
 
@@ -39,6 +39,44 @@ void renderHomePage(SDL_Renderer *renderer, TTF_Font *fontSmall, const std::vect
                    textColor);
     }
 
+    // vẽ từng node
+    for (auto &n : nodes)
+    {
+        SDL_Rect nodeRect = {static_cast<int>(n.getX()), static_cast<int>(n.getY()), 20, 20};
+        SDL_SetRenderDrawColor(renderer, 200, 0, 0, 255); // Node màu đỏ
+        SDL_RenderFillRect(renderer, &nodeRect);
+
+        renderText(renderer, fontSmall, n.getNodeID(),
+                   static_cast<int>(n.getX()) - 5,
+                   static_cast<int>(n.getY()) - 20,
+                   textColor);
+    }
+
+    // vẽ các cạnh giữa các node
+    for (auto &e : edges)
+    {
+        const Node *startNode = nullptr;
+        const Node *endNode = nullptr;
+
+        for (auto &n : nodes)
+        {
+            if (n.getNodeID() == e.getStartNode())
+                startNode = &n;
+            if (n.getNodeID() == e.getEndNode())
+                endNode = &n;
+        }
+
+        if (startNode && endNode)
+        {
+            SDL_SetRenderDrawColor(renderer, 100, 100, 100, 255);
+            SDL_RenderDrawLine(renderer,
+                               static_cast<int>(startNode->getX()) + 10,
+                               static_cast<int>(startNode->getY()) + 10,
+                               static_cast<int>(endNode->getX()) + 10,
+                               static_cast<int>(endNode->getY()) + 10);
+        }
+    }
+
     // Lấy kích thước cửa sổ
     int w, h;
     SDL_GetRendererOutputSize(renderer, &w, &h);
@@ -49,11 +87,16 @@ void renderHomePage(SDL_Renderer *renderer, TTF_Font *fontSmall, const std::vect
     SDL_SetRenderDrawColor(renderer, 0, 150, 255, 255);
     SDL_RenderFillRect(renderer, &addBtn);
     renderText(renderer, fontSmall, "Add Drone", addBtn.x + 10, addBtn.y + 10, {255, 255, 255, 255});
+
+    SDL_Rect addNodeBtn = {w - 2 * btnW - 40, h - btnH - 20, btnW, btnH};
+    SDL_SetRenderDrawColor(renderer, 255, 100, 0, 255);
+    SDL_RenderFillRect(renderer, &addNodeBtn);
+    renderText(renderer, fontSmall, "Add Node", addNodeBtn.x + 10, addNodeBtn.y + 10, {255, 255, 255, 255});
 }
 
 // Xử lý click nút Add Drone
 
-void handleHomePageClick(SDL_Renderer *renderer, int mx, int my, vector<Drone> &drones)
+void handleHomePageDroneClick(SDL_Renderer *renderer, int mx, int my)
 {
     int w, h;
     SDL_GetRendererOutputSize(renderer, &w, &h); // lấy đúng renderer
@@ -82,4 +125,48 @@ void handleAddDroneClick(int mx, int my, vector<Drone> &drones)
     writeDronesToFile("D:/Drone-project/src/data/Drone.txt", drones);
 
     isAddingDrone = false;
+}
+
+void handleHomePageNodeClick(SDL_Renderer *renderer, int mx, int my)
+{
+    int w, h;
+    SDL_GetRendererOutputSize(renderer, &w, &h); // lấy đúng renderer
+    int btnW = 120, btnH = 40;
+    SDL_Rect addNodeBtn = {w - 2 * btnW - 40, h - btnH - 20, btnW, btnH};
+    if (isMouseInside(addNodeBtn, mx, my))
+    {
+        isAddingNode = true;
+    }
+}
+
+void handleAddNodeClick(int mx, int my, vector<Node> &nodes, vector<Edge> &edges)
+{
+    if (!isAddingNode)
+        return;
+
+    int idNum = nodes.size() + 1;
+    string newID = "N0" + to_string(idNum);
+    string name = "Node_" + to_string(idNum);
+
+    Node newNode(newID, name, static_cast<float>(mx), static_cast<float>(my));
+    nodes.push_back(newNode);
+
+    writeNodesToFile("D:/Drone-project/src/data/Node.txt", nodes);
+
+    // --- THÊM EDGE MỚI ---
+    int nextEdgeID = edges.empty() ? 1 : edges.back().getEdgeID() + 1;
+
+    // Mỗi node mới sẽ nối với tất cả node khác
+    for (size_t i = 0; i < nodes.size() - 1; ++i)
+    {
+        const Node &other = nodes[i];
+        float dist = calculateDistance(newNode.getX(), newNode.getY(), other.getX(), other.getY());
+
+        // Edge 1 chiều (nếu bạn muốn 2 chiều thì tạo thêm edge ngược lại)
+        edges.emplace_back(nextEdgeID++, newNode.getNodeID(), other.getNodeID(), dist);
+        }
+
+    // Ghi toàn bộ edges vào file
+    writeEdgesToFile("D:/Drone-project/src/data/Edge.txt", edges);
+    isAddingNode = false;
 }

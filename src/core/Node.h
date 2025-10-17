@@ -2,29 +2,34 @@
 #define NODE_H
 
 #include <string>
+#include <vector>
+
 using namespace std;
 
-class Node {
+class Node
+{
 private:
     string NodeID;
     string Name;
-    int X;
-    int Y;
+    float X, Y;
 
 public:
     Node() = default;
-    Node(string id, string name, int x, int y);
+    Node(string id, string name, float x, float y);
 
+    // Getter
     string getNodeID() const;
     string getName() const;
-    int getX() const;
-    int getY() const;
+    float getX() const;
+    float getY() const;
 
-    void setNodeID(const string& id);
-    void setName(const string& name);
-    void setX(int x);
-    void setY(int y);
-
+    // Setter
+    void setNodeID(const string &id);
+    void setName(const string &name);
+    void setPosition(float x, float y); // Set X và Y cùng lúc
 };
+
+vector<Node> readNodesFromFile(const string &filename);
+void writeNodesToFile(const string &filename, const vector<Node> &nodes);
 
 #endif
