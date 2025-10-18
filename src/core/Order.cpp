@@ -1,5 +1,4 @@
 #include "Order.h"
-#include <iostream>
 
 Order::Order(string id, string pickup, string dropoff, float weight, string priority, string status)
     : OrderID(id), PickupLocation(pickup), DropoffLocation(dropoff), Weight(weight), Priority(priority), Status(status) {}
@@ -18,4 +17,26 @@ void Order::setPickupLocation(const string &pickup) { PickupLocation = pickup; }
 void Order::setDropoffLocation(const string &dropoff) { DropoffLocation = dropoff; }
 void Order::setWeight(float weight) { Weight = weight; }
 void Order::setPriority(const string &priority) { Priority = priority; }
-void Order::setStatus(const string &status) { Status = status;}
+void Order::setStatus(const string &status) { Status = status; }
+
+vector<Order> readOrdersFromFile(const string &filename)
+{
+    vector<Order> orders;
+    ifstream fin(filename);
+    if (!fin.is_open())
+    {
+        cerr << "Không thể mở file " << filename << endl;
+        return orders;
+    }
+
+    string id, pickup, dropoff, priority, status;
+    float weight;
+
+    while (fin >> id >> pickup >> dropoff >> weight >> priority >> status)
+    {
+        orders.emplace_back(id, pickup, dropoff, weight, priority, status);
+    }
+
+    fin.close();
+    return orders;
+}
