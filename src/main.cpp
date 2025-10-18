@@ -6,9 +6,11 @@
 #include <chrono>
 #include "render/Renderer.h"
 #include "core/Drone.h"
+#include "core/Order.h"
 #include "render/Page/HomePage.h"
 #include "render/Page/DronePage.h"
 #include "algorithm/PathFinder/Dijkstra.h"
+#include "algorithm/Assignment/Greedy.h"
 using namespace std;
 
 bool isAddingDrone = false;
@@ -26,6 +28,7 @@ int main(int argc, char *argv[])
     vector<Drone> drones = readDronesFromFile("D:/Drone-project/src/data/Drone.txt");
     vector<Node> nodes = readNodesFromFile("D:/Drone-project/src/data/Node.txt");
     vector<Edge> edges = readEdgesFromFile("D:/Drone-project/src/data/Edge.txt");
+    vector<Order> orders = readOrdersFromFile("D:/Drone-project/src/data/Orders.txt");
 
     if (SDL_Init(SDL_INIT_VIDEO) < 0)
     {
@@ -146,15 +149,9 @@ int main(int argc, char *argv[])
                 if (!isMoving)
                 {
                     isMoving = true;
-                    vector<string> pathIDs = dijkstra("N01", "N05");
-                    vector<Node> pathNodes;
-                    for (const string &id : pathIDs)
-                        for (const Node &n : nodes)
-                            if (n.getNodeID() == id)
-                                pathNodes.push_back(n);
 
-                    drones[0].setPath(pathNodes);
-                    drones[0].setStatus("moving");
+                    // ---- Gọi Greedy assign Orders cho drones ----
+                    assignOrdersGreedy(drones, orders, nodes, edges);
                 }
             }
         }
@@ -203,11 +200,11 @@ int main(int argc, char *argv[])
             if (isMoving)
             {
                 auto currentTime = chrono::high_resolution_clock::now();
-
                 float deltaTime = chrono::duration<float>(currentTime - lastTime).count();
                 lastTime = currentTime;
 
-                drones[0].updateMove(deltaTime);
+                for (auto &d : drones)
+                    d.updateMove(deltaTime);
             }
         }
 

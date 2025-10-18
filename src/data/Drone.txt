@@ -1,1 +1,2 @@
-D001 Drone_1 608 43 40 100 idle
+D001 Drone_1 559 212 40 100 idle
+D002 Drone_2 791 269 40 100 idle

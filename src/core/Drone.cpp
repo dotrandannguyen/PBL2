@@ -29,6 +29,17 @@ void Drone::setSpeed(float speed) { Speed = speed; }
 void Drone::setBattery(int battery) { Battery = battery; }
 void Drone::setStatus(const string &status) { Status = status; }
 
+void Drone::setPath(const vector<Node> &nodes)
+{
+    path = nodes;
+    currentTargetIndex = 0;
+    if (!path.empty())
+    {
+        setPosition(path[0].getX(), path[0].getY());
+        setStatus("moving");
+    }
+}
+
 // Đọc file
 vector<Drone> readDronesFromFile(const string &filename)
 {
@@ -51,17 +62,6 @@ vector<Drone> readDronesFromFile(const string &filename)
 
     file.close();
     return drones;
-}
-
-void Drone::setPath(const vector<Node> &nodes)
-{
-    path = nodes;
-    currentTargetIndex = 0;
-    if (!path.empty())
-    {
-        setPosition(path[0].getX(), path[0].getY());
-        setStatus("moving");
-    }
 }
 
 // Hàm updateMove(deltaTime)
