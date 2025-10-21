@@ -1,15 +1,6 @@
 #include "DronePage.h"
 
-#include <iomanip>
-#include <sstream>
-
 using namespace std;
-
-struct DroneButton
-{
-    SDL_Rect rect;
-    string label;
-};
 
 void renderDronePage(SDL_Renderer *renderer, TTF_Font *font, const vector<Drone> &drones, int startX)
 {
@@ -48,7 +39,11 @@ void renderDronePage(SDL_Renderer *renderer, TTF_Font *font, const vector<Drone>
         SDL_Rect headerRect = {x, y, colWidths[i], rowHeight};
         SDL_SetRenderDrawColor(renderer, headerColor.r, headerColor.g, headerColor.b, headerColor.a);
         SDL_RenderFillRect(renderer, &headerRect);
-        renderText(renderer, font, headers[i], x + 5, y + 10, textColor);
+        int textW, textH;
+        TTF_SizeText(font, headers[i].c_str(), &textW, &textH);
+        int textX = x + (colWidths[i] - textW) / 2;
+        int textY = y + (rowHeight - textH) / 2;
+        renderText(renderer, font, headers[i], textX, textY, textColor);
         x += colWidths[i];
     }
 
@@ -75,20 +70,45 @@ void renderDronePage(SDL_Renderer *renderer, TTF_Font *font, const vector<Drone>
             SDL_Rect cell = {x, y, colWidths[i], rowHeight};
             SDL_SetRenderDrawColor(renderer, 245, 245, 245, 255);
             SDL_RenderFillRect(renderer, &cell);
-            renderText(renderer, font, row[i], x + 5, y + 10, textColor);
+            int textW, textH;
+            TTF_SizeText(font, row[i].c_str(), &textW, &textH);
+            int textX = x + (colWidths[i] - textW) / 2;
+            int textY = y + (rowHeight - textH) / 2;
+            renderText(renderer, font, row[i], textX, textY, textColor);
             x += colWidths[i];
         }
 
-        // Nút Edit / Delete
-        SDL_Rect editBtn = {x, y + 5, 70, 30};
-        SDL_Rect delBtn = {x + 80, y + 5, 70, 30};
+        int btnW = 70;
+        int btnH = 30;
+        int btnGap = 20;
+
+        int totalBtnWidth = btnW * 2 + btnGap;
+
+        int btnStartX = x + (colWidths.back() - totalBtnWidth) / 2;
+        int btnY = y + (rowHeight - btnH) / 2;
+
+        SDL_Rect editBtn = {btnStartX, btnY, btnW, btnH};
+        SDL_Rect delBtn = {btnStartX + btnW + btnGap, btnY, btnW, btnH};
 
         SDL_SetRenderDrawColor(renderer, btnColor.r, btnColor.g, btnColor.b, 255);
         SDL_RenderFillRect(renderer, &editBtn);
         SDL_RenderFillRect(renderer, &delBtn);
 
-        renderText(renderer, font, "Edit", editBtn.x + 10, editBtn.y + 5, btnTextColor);
-        renderText(renderer, font, "Delete", delBtn.x + 5, delBtn.y + 5, btnTextColor);
+        int textW, textH;
+
+        // Edit
+        TTF_SizeText(font, "Edit", &textW, &textH);
+        renderText(renderer, font, "Edit",
+                   editBtn.x + (btnW - textW) / 2,
+                   editBtn.y + (btnH - textH) / 2,
+                   btnTextColor);
+
+        // DELETE
+        TTF_SizeText(font, "Delete", &textW, &textH);
+        renderText(renderer, font, "Delete",
+                   delBtn.x + (btnW - textW) / 2,
+                   delBtn.y + (btnH - textH) / 2,
+                   btnTextColor);
 
         y += rowHeight;
     }

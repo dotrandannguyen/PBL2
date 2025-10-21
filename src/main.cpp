@@ -7,6 +7,7 @@
 #include "render/Renderer.h"
 #include "core/Drone.h"
 #include "core/Order.h"
+#include "render/Page/OrderPage.h"
 #include "render/Page/HomePage.h"
 #include "render/Page/DronePage.h"
 #include "algorithm/PathFinder/Dijkstra.h"
@@ -209,7 +210,14 @@ int main(int argc, char *argv[])
         }
 
         else if (currentPage == "Drone")
+        {
             renderDronePage(renderer, font, drones, contentX);
+        }
+
+        else if (currentPage == "Order")
+        {
+            renderOrderPage(renderer, font, orders, contentX);
+        }
 
         SDL_RenderPresent(renderer);
     }
