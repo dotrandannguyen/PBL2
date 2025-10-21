@@ -203,9 +203,19 @@ int main(int argc, char *argv[])
                 auto currentTime = chrono::high_resolution_clock::now();
                 float deltaTime = chrono::duration<float>(currentTime - lastTime).count();
                 lastTime = currentTime;
-
+                bool anyFinished = false;
                 for (auto &d : drones)
-                    d.updateMove(deltaTime);
+                {
+                    bool stillMoving = d.updateMove(deltaTime);
+                    if (!stillMoving && d.getStatus() == "idle")
+                    {
+                        anyFinished = true;
+                    }
+                }
+                if (anyFinished)
+                {
+                    assignOrdersGreedy(drones, orders, nodes, edges);
+                }
             }
         }
 
