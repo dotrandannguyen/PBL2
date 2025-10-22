@@ -1,127 +1,239 @@
 #include <SDL2/SDL.h>
+#include <SDL2/SDL_ttf.h>
 #include <iostream>
-#include <cmath>
+#include <string>
+#include <vector>
+#include <chrono>
+#include "render/Renderer.h"
+#include "core/Drone.h"
+#include "core/Order.h"
+#include "render/Page/OrderPage.h"
+#include "render/Page/HomePage.h"
+#include "render/Page/DronePage.h"
+#include "algorithm/PathFinder/Dijkstra.h"
+#include "algorithm/Assignment/Greedy.h"
+using namespace std;
 
-// Hàm vẽ hình tròn (outline)
-void drawCircle(SDL_Renderer *renderer, int cx, int cy, int radius)
+bool isAddingDrone = false;
+bool isAddingNode = false;
+
+struct Button
 {
-    int x = radius - 1;
-    int y = 0;
-    int dx = 1;
-    int dy = 1;
-    int err = dx - (radius << 1);
-
-    while (x >= y)
-    {
-        SDL_RenderDrawPoint(renderer, cx + x, cy + y);
-        SDL_RenderDrawPoint(renderer, cx + y, cy + x);
-        SDL_RenderDrawPoint(renderer, cx - y, cy + x);
-        SDL_RenderDrawPoint(renderer, cx - x, cy + y);
-        SDL_RenderDrawPoint(renderer, cx - x, cy - y);
-        SDL_RenderDrawPoint(renderer, cx - y, cy - x);
-        SDL_RenderDrawPoint(renderer, cx + y, cy - x);
-        SDL_RenderDrawPoint(renderer, cx + x, cy - y);
-
-        if (err <= 0)
-        {
-            y++;
-            err += dy;
-            dy += 2;
-        }
-        if (err > 0)
-        {
-            x--;
-            dx += 2;
-            err += dx - (radius << 1);
-        }
-    }
-}
-
-// Hàm vẽ hình tròn đặc (filled)
-void drawFilledCircle(SDL_Renderer *renderer, int cx, int cy, int radius)
-{
-    for (int w = 0; w < radius * 2; w++)
-    {
-        for (int h = 0; h < radius * 2; h++)
-        {
-            int dx = radius - w; // khoảng cách từ tâm theo X
-            int dy = radius - h; // khoảng cách từ tâm theo Y
-            if ((dx * dx + dy * dy) <= (radius * radius))
-            {
-                SDL_RenderDrawPoint(renderer, cx + dx, cy + dy);
-            }
-        }
-    }
-}
+    SDL_Rect rect;
+    string label;
+    bool selected;
+};
 
 int main(int argc, char *argv[])
 {
+    vector<Drone> drones = readDronesFromFile("D:/Drone-project/src/data/Drone.txt");
+    vector<Node> nodes = readNodesFromFile("D:/Drone-project/src/data/Node.txt");
+    vector<Edge> edges = readEdgesFromFile("D:/Drone-project/src/data/Edge.txt");
+    vector<Order> orders = readOrdersFromFile("D:/Drone-project/src/data/Orders.txt");
+
     if (SDL_Init(SDL_INIT_VIDEO) < 0)
     {
-        std::cout << "SDL không thể khởi tạo! Lỗi: " << SDL_GetError() << "\n";
+        cout << "SDL could not initialize! " << SDL_GetError() << "\n";
         return 1;
     }
 
-    SDL_Window *window = SDL_CreateWindow("Ve hinh tron - SDL2",
-                                          SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED,
-                                          800, 600, SDL_WINDOW_SHOWN);
-
-    if (!window)
+    if (TTF_Init() == -1)
     {
-        std::cout << "Không tạo được cửa sổ! Lỗi: " << SDL_GetError() << "\n";
-        SDL_Quit();
+        cout << "TTF could not initialize! " << TTF_GetError() << "\n";
         return 1;
     }
 
+    SDL_DisplayMode DM;
+    SDL_GetCurrentDisplayMode(0, &DM);
+    int screenWidth = DM.w;
+    int screenHeight = DM.h;
+
+    SDL_Window *window = SDL_CreateWindow("Dashboard - SDL2",
+                                          SDL_WINDOWPOS_CENTERED,
+                                          SDL_WINDOWPOS_CENTERED,
+                                          screenWidth,
+                                          screenHeight,
+                                          SDL_WINDOW_SHOWN | SDL_WINDOW_RESIZABLE);
     SDL_Renderer *renderer = SDL_CreateRenderer(window, -1, SDL_RENDERER_ACCELERATED);
-    if (!renderer)
+
+    SDL_Color bgColor = {245, 247, 250, 255};
+    SDL_Color sidebarColor = {23, 42, 69, 255};
+    SDL_Color textColor = {255, 255, 255, 255};
+    SDL_Color selectedColor = {255, 174, 66, 255};
+
+    TTF_Font *font = TTF_OpenFont("C:/Windows/Fonts/segoeui.ttf", 22);
+    TTF_Font *fontSmall = TTF_OpenFont("C:/Windows/Fonts/segoeui.ttf", 12);
+    if (!font)
     {
-        std::cout << "Không tạo được renderer! Lỗi: " << SDL_GetError() << "\n";
-        SDL_DestroyWindow(window);
-        SDL_Quit();
+        cout << "Không tìm thấy font!\n";
         return 1;
     }
+
+    // Sidebar width chiếm 15% màn hình
+    int sidebarWidth = static_cast<int>(screenWidth * 0.15);
+    int sidebarMargin = 10; // Khoảng cách nút 3 gạch
+
+    // Các nút sidebar tính theo tỷ lệ màn hình
+    vector<Button> buttons = {
+        {{0, static_cast<int>(screenHeight * 0.15), sidebarWidth, static_cast<int>(screenHeight * 0.06)}, "Home", true},
+        {{0, static_cast<int>(screenHeight * 0.23), sidebarWidth, static_cast<int>(screenHeight * 0.06)}, "Drone", false},
+        {{0, static_cast<int>(screenHeight * 0.31), sidebarWidth, static_cast<int>(screenHeight * 0.06)}, "Task", false},
+        {{0, static_cast<int>(screenHeight * 0.39), sidebarWidth, static_cast<int>(screenHeight * 0.06)}, "Notification", false},
+        {{0, static_cast<int>(screenHeight * 0.47), sidebarWidth, static_cast<int>(screenHeight * 0.06)}, "Order", false},
+        {{0, static_cast<int>(screenHeight * 0.55), sidebarWidth, static_cast<int>(screenHeight * 0.06)}, "Graph", false}};
+
+    string currentPage = "Home";
 
     bool quit = false;
+    bool sidebarVisible = true;
+    bool isMoving = false;
+    auto lastTime = chrono::high_resolution_clock::now();
     SDL_Event e;
-
-    int cx = 400, cy = 300;
-    int radius = 80;
-    bool filled = true;
 
     while (!quit)
     {
+        int menuX = sidebarVisible ? sidebarWidth + sidebarMargin : sidebarMargin;
+        SDL_Rect menuBtn = {menuX, 20, 50, 40};
         while (SDL_PollEvent(&e))
         {
             if (e.type == SDL_QUIT)
                 quit = true;
-            else if (e.type == SDL_KEYDOWN)
+            else if (e.type == SDL_MOUSEBUTTONDOWN)
             {
-                if (e.key.keysym.sym == SDLK_ESCAPE)
-                    quit = true;
-                else if (e.key.keysym.sym == SDLK_SPACE)
-                    filled = !filled; // đổi chế độ
+                int mx = e.button.x;
+                int my = e.button.y;
+
+                //  Nút 3 gạch — luôn nằm sát mép sidebar
+
+                if (isMouseInside(menuBtn, mx, my))
+                {
+                    sidebarVisible = !sidebarVisible;
+                }
+
+                // Nếu sidebar đang hiển thị, xử lý click các nút
+                if (sidebarVisible)
+                {
+                    for (auto &btn : buttons)
+                    {
+                        if (isMouseInside(btn.rect, mx, my))
+                        {
+                            for (auto &b : buttons)
+                                b.selected = false;
+                            btn.selected = true;
+                            currentPage = btn.label;
+                        }
+                    }
+                }
+                // Xử lý click trang Home
+                if (currentPage == "Home")
+                {
+                    if (isAddingDrone)
+                    {
+                        handleAddDroneClick(mx, my, drones);
+                    }
+                    else
+                    {
+                        handleHomePageDroneClick(renderer, mx, my);
+                    }
+                    if (isAddingNode)
+                    {
+                        handleAddNodeClick(mx, my, nodes, edges);
+                    }
+                    else
+                    {
+                        handleHomePageNodeClick(renderer, mx, my);
+                    }
+                }
+            }
+            else if (e.key.keysym.sym == SDLK_SPACE)
+            {
+                if (!isMoving)
+                {
+                    isMoving = true;
+
+                    // ---- Gọi Greedy assign Orders cho drones ----
+                    assignOrdersGreedy(drones, orders, nodes, edges);
+                }
             }
         }
 
-        // Xóa màn hình (màu nền)
-        SDL_SetRenderDrawColor(renderer, 25, 25, 30, 255);
+        // Vẽ nền
+        SDL_SetRenderDrawColor(renderer, bgColor.r, bgColor.g, bgColor.b, 255);
         SDL_RenderClear(renderer);
 
-        // Vẽ hình tròn
-        SDL_SetRenderDrawColor(renderer, 0, 200, 255, 255);
-        if (filled)
-            drawFilledCircle(renderer, cx, cy, radius);
-        else
-            drawCircle(renderer, cx, cy, radius);
+        //  Sidebar
+        if (sidebarVisible)
+        {
+            SDL_Rect sidebar = {0, 0, sidebarWidth, screenHeight};
+            SDL_SetRenderDrawColor(renderer, sidebarColor.r, sidebarColor.g, sidebarColor.b, 255);
+            SDL_RenderFillRect(renderer, &sidebar);
 
-        // Vẽ tâm
-        SDL_SetRenderDrawColor(renderer, 255, 0, 0, 255);
-        SDL_RenderDrawPoint(renderer, cx, cy);
+            // Các nút sidebar
+            for (auto &btn : buttons)
+            {
+                SDL_Rect btnRect = btn.rect; // Xử lý btnRect.x = 0
+                if (btn.selected)
+                    SDL_SetRenderDrawColor(renderer, selectedColor.r, selectedColor.g, selectedColor.b, 255);
+                else
+                    SDL_SetRenderDrawColor(renderer, sidebarColor.r, sidebarColor.g, sidebarColor.b, 255);
+
+                SDL_RenderFillRect(renderer, &btnRect);
+                renderText(renderer, font, btn.label, btnRect.x + 20, btnRect.y + 10, textColor);
+            }
+        }
+
+        // Nút 3 gạch — luôn ở cạnh sidebar
+
+        SDL_SetRenderDrawColor(renderer, 50, 50, 50, 255);
+        for (int i = 0; i < 3; i++)
+        {
+            SDL_Rect line = {menuBtn.x + 10, menuBtn.y + 8 + i * 10, 30, 4};
+            SDL_RenderFillRect(renderer, &line);
+        }
+
+        // Nội dung trang
+        int contentX = sidebarVisible ? sidebarWidth + 20 : 20;
+
+        if (currentPage == "Home")
+        {
+            renderHomePage(renderer, fontSmall, drones, nodes, edges);
+
+            if (isMoving)
+            {
+                auto currentTime = chrono::high_resolution_clock::now();
+                float deltaTime = chrono::duration<float>(currentTime - lastTime).count();
+                lastTime = currentTime;
+                bool anyFinished = false;
+                for (auto &d : drones)
+                {
+                    bool stillMoving = d.updateMove(deltaTime);
+                    if (!stillMoving && d.getStatus() == "idle")
+                    {
+                        anyFinished = true;
+                    }
+                }
+                if (anyFinished)
+                {
+                    assignOrdersGreedy(drones, orders, nodes, edges);
+                }
+            }
+        }
+
+        else if (currentPage == "Drone")
+        {
+            renderDronePage(renderer, font, drones, contentX);
+        }
+
+        else if (currentPage == "Order")
+        {
+            renderOrderPage(renderer, font, orders, contentX);
+        }
 
         SDL_RenderPresent(renderer);
     }
 
+    TTF_CloseFont(font);
+    TTF_Quit();
     SDL_DestroyRenderer(renderer);
     SDL_DestroyWindow(window);
     SDL_Quit();
