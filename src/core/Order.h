@@ -41,5 +41,6 @@ public:
 };
 
 vector<Order> readOrdersFromFile(const string &filename);
+void writeOrdersToFile(const string &filename, const vector<Order> &orders);
 
 #endif

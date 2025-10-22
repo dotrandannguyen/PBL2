@@ -16,6 +16,7 @@ using namespace std;
 
 bool isAddingDrone = false;
 bool isAddingNode = false;
+bool isAddingOrder = false;
 
 struct Button
 {
@@ -144,8 +145,18 @@ int main(int argc, char *argv[])
                         handleHomePageNodeClick(renderer, mx, my);
                     }
                 }
+                else if (currentPage == "Order")
+                {
+                    int winW, winH;
+                    SDL_GetRendererOutputSize(renderer, &winW, &winH);
+                    SDL_Rect addBtn = {winW - 140 - 30, 15, 140, 40};
+                    if (isMouseInside(addBtn, mx, my))
+                    {
+                        handleAddOrder(orders);
+                    }
+                }
             }
-            else if (e.key.keysym.sym == SDLK_SPACE)
+            else if (e.key.keysym.sym == SDLK_TAB)
             {
                 if (!isMoving)
                 {

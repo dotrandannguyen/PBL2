@@ -40,3 +40,25 @@ vector<Order> readOrdersFromFile(const string &filename)
     fin.close();
     return orders;
 }
+
+void writeOrdersToFile(const string &filename, const vector<Order> &orders)
+{
+    ofstream file(filename, ios::app); // ghi dè
+    if (!file.is_open())
+    {
+        cerr << "Khong the ghi file: " << filename << endl;
+        return;
+    }
+
+    for (const auto &o : orders)
+    {
+        file << o.getOrderID() << " "
+             << o.getPickupLocation() << " "
+             << o.getDropoffLocation() << " "
+             << o.getWeight() << " "
+             << o.getPriority() << " "
+             << o.getStatus() << "\n";
+    }
+
+    file.close();
+}

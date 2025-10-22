@@ -17,6 +17,21 @@ void renderOrderPage(SDL_Renderer *renderer, TTF_Font *font, const vector<Order>
     int winW, winH;
     SDL_GetRendererOutputSize(renderer, &winW, &winH);
 
+    // add button
+    int btnAddW = 140;
+    int btnAddH = 40;
+    SDL_Rect addBtn = {winW - btnAddW - 30, 15, btnAddW, btnAddH};
+    SDL_Color addBtnColor = {40, 167, 69, 255};
+    SDL_Color addBtnText = {255, 255, 255, 255};
+    SDL_SetRenderDrawColor(renderer, addBtnColor.r, addBtnColor.g, addBtnColor.b, 255);
+    SDL_RenderFillRect(renderer, &addBtn);
+    int textW, textH;
+    TTF_SizeText(font, "+ Add Order", &textW, &textH);
+    renderText(renderer, font, "+ Add Order",
+               addBtn.x + (btnAddW - textW) / 2,
+               addBtn.y + (btnAddH - textH) / 2,
+               addBtnText);
+
     vector<string> headers = {"OrderID", "Pickup", "Dropoff", "Weight", "Priority", "Status", "Actions"};
 
     vector<int> colWidths = {120, 120, 120, 200, 120, 120, 200};
@@ -117,4 +132,24 @@ void renderOrderPage(SDL_Renderer *renderer, TTF_Font *font, const vector<Order>
 
         y += rowHeight;
     }
+}
+
+void handleAddOrder(vector<Order> &orders)
+{
+    string pickup, dropoff;
+    cout << "Pickup: ";
+    cin >> pickup;
+    cout << "Dropoff: ";
+    cin >> dropoff;
+    Order newOrder(
+        "O" + to_string(orders.size() + 1), // ID tự tăng
+        pickup,
+        dropoff,
+        3.0,      // weight mặc định
+        "Normal", // priority mặc định
+        "pending" // status mặc định
+    );
+    orders.push_back(newOrder);
+
+    writeOrdersToFile("D:/Drone-project/src/data/Orders.txt", orders);
 }

@@ -4,6 +4,7 @@ using namespace std;
 
 void renderDronePage(SDL_Renderer *renderer, TTF_Font *font, const vector<Drone> &drones, int startX)
 {
+
     SDL_Color textColor = {0, 0, 0, 255};
     SDL_Color headerColor = {200, 200, 200, 255};
     SDL_Color btnColor = {23, 162, 184, 255};
@@ -17,7 +18,7 @@ void renderDronePage(SDL_Renderer *renderer, TTF_Font *font, const vector<Drone>
     int winW, winH;
     SDL_GetRendererOutputSize(renderer, &winW, &winH);
 
-    // 1️⃣ Header
+    //  Header
     vector<string> headers = {"DroneID", "Name", "Position", "Speed", "Battery", "Status", "Actions"};
     vector<int> colWidths = {
         100, 120, 200, 120, 90, 100, 200 // 7 cột
@@ -49,7 +50,7 @@ void renderDronePage(SDL_Renderer *renderer, TTF_Font *font, const vector<Drone>
 
     y += rowHeight; // sang dòng dữ liệu
 
-    // 2️⃣ Vẽ dữ liệu drone
+    //  Vẽ dữ liệu drone
     for (auto &d : drones)
     {
         x = startX;
