@@ -128,14 +128,7 @@ int main(int argc, char *argv[])
                 // Xử lý click trang Home
                 if (currentPage == "Home")
                 {
-                    if (isAddingDrone)
-                    {
-                        handleAddDroneClick(mx, my, drones);
-                    }
-                    else
-                    {
-                        handleHomePageDroneClick(renderer, mx, my);
-                    }
+                    handleHomePageDroneClick(renderer, mx, my, drones, nodes);
                     if (isAddingNode)
                     {
                         handleAddNodeClick(mx, my, nodes, edges);
@@ -160,6 +153,10 @@ int main(int argc, char *argv[])
             {
                 if (!isMoving)
                 {
+                    for (auto &d : drones)
+                    {
+                        snapDroneToNode(d, nodes);
+                    }
                     isMoving = true;
 
                     // ---- Gọi Greedy assign Orders cho drones ----
@@ -217,10 +214,11 @@ int main(int argc, char *argv[])
                 bool anyFinished = false;
                 for (auto &d : drones)
                 {
-                    bool stillMoving = d.updateMove(deltaTime);
-                    if (!stillMoving && d.getStatus() == "idle")
+                    d.updateMove(deltaTime);
+                    if (d.getFinished())
                     {
                         anyFinished = true;
+                        d.setFinished(false);
                     }
                 }
                 if (anyFinished)

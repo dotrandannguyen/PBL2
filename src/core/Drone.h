@@ -15,6 +15,10 @@ private:
     float Speed;
     int Battery;
     string Status;
+    string currentNodeID;
+
+    // check drone da bay xong chua
+    bool justFinished = false;
 
     // thêm biến phục vụ di chuyển
     vector<Node> path;
@@ -22,7 +26,7 @@ private:
 
 public:
     Drone(string id = "", string name = "", float x = 0, float y = 0,
-          float speed = 0, int battery = 0, string status = "");
+          float speed = 0, int battery = 0, string status = "", string currentNodeId = "");
 
     // Getter
     string getDroneID() const;
@@ -32,7 +36,8 @@ public:
     float getSpeed() const;
     int getBattery() const;
     string getStatus() const;
-
+    string getCurrentNodeID() const;
+    bool getFinished() const;
     // Setter
     void setDroneID(const string &id);
     void setName(const string &name);
@@ -40,6 +45,8 @@ public:
     void setSpeed(float speed);
     void setBattery(int battery);
     void setStatus(const string &status);
+    void setCurrentNodeID(const string &id);
+    void setFinished(const bool &value);
 
     void setPath(const vector<Node> &nodes);
     bool updateMove(float deltaTime);

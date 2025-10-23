@@ -41,7 +41,7 @@ vector<Order> readOrdersFromFile(const string &filename)
     return orders;
 }
 
-void writeOrdersToFile(const string &filename, const vector<Order> &orders)
+void writeOrdersToFile(const string &filename, const Order &o)
 {
     ofstream file(filename, ios::app); // ghi dè
     if (!file.is_open())
@@ -50,15 +50,12 @@ void writeOrdersToFile(const string &filename, const vector<Order> &orders)
         return;
     }
 
-    for (const auto &o : orders)
-    {
-        file << o.getOrderID() << " "
-             << o.getPickupLocation() << " "
-             << o.getDropoffLocation() << " "
-             << o.getWeight() << " "
-             << o.getPriority() << " "
-             << o.getStatus() << "\n";
-    }
+    file << o.getOrderID() << " "
+         << o.getPickupLocation() << " "
+         << o.getDropoffLocation() << " "
+         << o.getWeight() << " "
+         << o.getPriority() << " "
+         << o.getStatus() << "\n";
 
     file.close();
 }

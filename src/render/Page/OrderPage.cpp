@@ -146,10 +146,10 @@ void handleAddOrder(vector<Order> &orders)
         pickup,
         dropoff,
         3.0,      // weight mặc định
-        "Normal", // priority mặc định
+        "normal", // priority mặc định
         "pending" // status mặc định
     );
     orders.push_back(newOrder);
 
-    writeOrdersToFile("D:/Drone-project/src/data/Orders.txt", orders);
+    writeOrdersToFile("D:/Drone-project/src/data/Orders.txt", newOrder);
 }

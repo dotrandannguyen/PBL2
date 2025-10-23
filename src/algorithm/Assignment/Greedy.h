@@ -15,6 +15,8 @@ const float INF = 1e9f;
 
 string findClosestNodeID(const Drone &d, const vector<Node> &nodes);
 
+void snapDroneToNode(Drone &d, const vector<Node> &nodes);
+
 float TotalPathDistance(const vector<string> &path, const vector<Edge> &edges);
 
 vector<Node> convertPathToNodes(const vector<string> &pathIDs, const vector<Node> &nodes);

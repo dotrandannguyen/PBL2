@@ -2,6 +2,7 @@
 
 string findClosestNodeID(const Drone &d, const vector<Node> &nodes)
 {
+    cout << "[DEBUGFINDCLOSETNODEID]  findCloestNodeID duoc goi" << " ";
     float minDist = 1e9;
     string closestNodeID = "";
 
@@ -17,8 +18,32 @@ string findClosestNodeID(const Drone &d, const vector<Node> &nodes)
         }
     }
 
+    cout << closestNodeID << endl;
     return closestNodeID;
 } // dùng tạm
+
+// ep drone ve node da set san
+
+void snapDroneToNode(Drone &d, const vector<Node> &nodes)
+{
+    cout << "[DEBUGSNAP] " << d.getDroneID() << " -> " << d.getCurrentNodeID() << endl;
+
+    string targetID = d.getCurrentNodeID();
+    if (targetID.empty())
+    {
+        targetID = findClosestNodeID(d, nodes);
+    }
+
+    for (const auto &n : nodes)
+    {
+        if (n.getNodeID() == targetID)
+        {
+            d.setPosition(n.getX(), n.getY());
+            d.setCurrentNodeID(n.getNodeID());
+            break;
+        }
+    }
+}
 
 float TotalPathDistance(const vector<string> &path, const vector<Edge> &edges)
 {
@@ -65,6 +90,9 @@ vector<Node> convertPathToNodes(const vector<string> &pathIDs, const vector<Node
 
 void assignOrdersGreedy(vector<Drone> &drones, vector<Order> &orders, const vector<Node> &nodes, const vector<Edge> &edges)
 {
+    cout << "[DEBUGDRONE] vi tri drone0 " << drones[0].getX() << " " << drones[0].getY() << endl;
+    cout << "[DEBUGDRONE] vi tri drone1 " << drones[1].getX() << " " << drones[1].getY() << endl;
+    cout << "[DEBUG] assignOrdersGreedy duoc goi!" << endl;
     for (auto &order : orders)
     {
         if (order.getStatus() != "pending")
@@ -84,6 +112,7 @@ void assignOrdersGreedy(vector<Drone> &drones, vector<Order> &orders, const vect
                 continue;
             string start = findClosestNodeID(d, nodes);
             // lay toa do cau drone o node nao lam diem start -> sau nay bo sug class sau
+            // string start = d.getCurrentNodeID(); // Drone luôn nằm trên node
 
             vector<string> path = dijkstra(start, pickup); // tìm path từ node start -> diem lay hang
 
