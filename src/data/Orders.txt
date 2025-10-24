@@ -1,7 +1,4 @@
 O1 N03 N08 1.5 high pending
-O2 N05 N06 0.8 normal pending
-
-
-
-O3 N04 N05 3 normal pending
-O4 N02 N03 3 normal pending
+O2 N02 N07 1 high pending
+O3 N04 N06 1 high pending
+O4 N01 N05 1 high pending

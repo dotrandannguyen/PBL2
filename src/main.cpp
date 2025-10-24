@@ -18,6 +18,11 @@ bool isAddingDrone = false;
 bool isAddingNode = false;
 bool isAddingOrder = false;
 
+vector<Drone> drones = readDronesFromFile("D:/Drone-project/src/data/Drone.txt");
+vector<Node> nodes = readNodesFromFile("D:/Drone-project/src/data/Node.txt");
+vector<Edge> edges = readEdgesFromFile("D:/Drone-project/src/data/Edge.txt");
+vector<Order> orders = readOrdersFromFile("D:/Drone-project/src/data/Orders.txt");
+
 struct Button
 {
     SDL_Rect rect;
@@ -27,10 +32,6 @@ struct Button
 
 int main(int argc, char *argv[])
 {
-    vector<Drone> drones = readDronesFromFile("D:/Drone-project/src/data/Drone.txt");
-    vector<Node> nodes = readNodesFromFile("D:/Drone-project/src/data/Node.txt");
-    vector<Edge> edges = readEdgesFromFile("D:/Drone-project/src/data/Edge.txt");
-    vector<Order> orders = readOrdersFromFile("D:/Drone-project/src/data/Orders.txt");
 
     if (SDL_Init(SDL_INIT_VIDEO) < 0)
     {
@@ -145,6 +146,7 @@ int main(int argc, char *argv[])
                     SDL_Rect addBtn = {winW - 140 - 30, 15, 140, 40};
                     if (isMouseInside(addBtn, mx, my))
                     {
+
                         handleAddOrder(orders);
                     }
                 }
@@ -153,13 +155,17 @@ int main(int argc, char *argv[])
             {
                 if (!isMoving)
                 {
+
                     for (auto &d : drones)
                     {
+
                         snapDroneToNode(d, nodes);
                     }
+                    lastTime = chrono::high_resolution_clock::now();
                     isMoving = true;
 
                     // ---- Gọi Greedy assign Orders cho drones ----
+
                     assignOrdersGreedy(drones, orders, nodes, edges);
                 }
             }
@@ -211,6 +217,8 @@ int main(int argc, char *argv[])
                 auto currentTime = chrono::high_resolution_clock::now();
                 float deltaTime = chrono::duration<float>(currentTime - lastTime).count();
                 lastTime = currentTime;
+                // cout << "[FRAME] deltaTime=" << deltaTime << endl;
+
                 bool anyFinished = false;
                 for (auto &d : drones)
                 {
@@ -235,6 +243,7 @@ int main(int argc, char *argv[])
 
         else if (currentPage == "Order")
         {
+
             renderOrderPage(renderer, font, orders, contentX);
         }
 

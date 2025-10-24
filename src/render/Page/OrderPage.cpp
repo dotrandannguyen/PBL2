@@ -145,11 +145,14 @@ void handleAddOrder(vector<Order> &orders)
         "O" + to_string(orders.size() + 1), // ID tự tăng
         pickup,
         dropoff,
-        3.0,      // weight mặc định
-        "normal", // priority mặc định
+        1.0,      // weight mặc định
+        "high",   // priority mặc định
         "pending" // status mặc định
     );
     orders.push_back(newOrder);
 
     writeOrdersToFile("D:/Drone-project/src/data/Orders.txt", newOrder);
+    // cout << "[DEBUG AFTER ADD] orders.size() = " << orders.size() << endl;
+    // for (auto &o : orders)
+    //     cout << o.getOrderID() << " " << o.getStatus() << endl;
 }

@@ -39,9 +39,13 @@ void Drone::setPath(const vector<Node> &nodes)
 {
     path = nodes;
     currentTargetIndex = 0;
+
     if (!path.empty())
     {
-        setPosition(path[0].getX(), path[0].getY());
+        if (Status == "idle" || path.size() == 1)
+        {
+            setPosition(path[0].getX(), path[0].getY());
+        }
         setStatus("moving");
     }
 }
@@ -49,6 +53,7 @@ void Drone::setPath(const vector<Node> &nodes)
 // Đọc file
 vector<Drone> readDronesFromFile(const string &filename)
 {
+    cout << "[DEBUG] readDronesFromFile() duoc goi!" << endl;
     vector<Drone> drones;
     ifstream file(filename);
     if (!file.is_open())
@@ -74,6 +79,7 @@ vector<Drone> readDronesFromFile(const string &filename)
 // Hàm updateMove(deltaTime)
 bool Drone::updateMove(float deltaTime)
 {
+
     if (Status != "moving" || path.empty() || currentTargetIndex >= (int)path.size())
         return false;
 
@@ -81,9 +87,15 @@ bool Drone::updateMove(float deltaTime)
     float dx = target.getX() - X;
     float dy = target.getY() - Y;
     float dist = sqrt(dx * dx + dy * dy);
-
+    // cout << "[UPDATE MOVE] " << DroneID
+    //      << " idx=" << currentTargetIndex
+    //      << " pos=(" << X << "," << Y << ") "
+    //      << " target=(" << target.getX() << "," << target.getY() << ") "
+    //      << " dist=" << dist
+    //      << " status=" << Status << endl;
     if (dist < 1.0f)
     {
+
         currentTargetIndex++;
         if (currentTargetIndex >= (int)path.size())
         {
@@ -104,6 +116,12 @@ bool Drone::updateMove(float deltaTime)
     float step = Speed * deltaTime;
     X += step * (dx / dist);
     Y += step * (dy / dist);
+
+    // // --- Log sau khi cập nhật vị trí ---
+    // cout << "[AFTER MOVE] " << DroneID
+    //      << " newPos=(" << X << "," << Y << ")" << endl;
+    // // ---------
+
     return true;
 }
 
