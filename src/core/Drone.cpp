@@ -53,12 +53,12 @@ void Drone::setPath(const vector<Node> &nodes)
 // Đọc file
 vector<Drone> readDronesFromFile(const string &filename)
 {
-    cout << "[DEBUG] readDronesFromFile() duoc goi!" << endl;
+    // cout << "[DEBUG] readDronesFromFile() duoc goi!" << endl;
     vector<Drone> drones;
     ifstream file(filename);
     if (!file.is_open())
     {
-        cerr << "Không thể mở file: " << filename << endl;
+        cerr << "Khong the doc file: " << filename << endl;
         return drones;
     }
 
@@ -131,7 +131,7 @@ void writeDronesToFile(const string &filename, const vector<Drone> &drones)
     ofstream file(filename);
     if (!file.is_open())
     {
-        cerr << "Không thể ghi file: " << filename << endl;
+        cerr << "Khong the ghi file: " << filename << endl;
         return;
     }
 

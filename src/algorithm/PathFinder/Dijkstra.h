@@ -8,7 +8,8 @@
 #include <string>
 #include <algorithm>
 
-using AdjList = unordered_map<string, vector<pair<string, float>>>; // canh ke co dang {N1, weight}
+using AdjList = unordered_map<string, vector<pair<string, float>>>; // canh ke co dang {N1, {N2, weight}}
+
 AdjList buildAdjacencyList(const vector<Edge> &edges);
 
 vector<string> dijkstra(const string &start, const string &end);

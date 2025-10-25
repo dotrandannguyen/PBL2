@@ -30,6 +30,8 @@ struct Button
     bool selected;
 };
 
+vector<DroneButton> droneButtons;
+
 int main(int argc, char *argv[])
 {
 
@@ -148,6 +150,22 @@ int main(int argc, char *argv[])
                     {
 
                         handleAddOrder(orders);
+                    }
+                }
+                else if (currentPage == "Drone")
+                {
+                    for (auto &db : droneButtons)
+                    {
+                        if (isMouseInside(db.editBtn, mx, my))
+                        {
+                            handleEditDrone(db.droneID, drones);
+                            break;
+                        }
+                        else if (isMouseInside(db.delBtn, mx, my))
+                        {
+                            handleDeleteDrone(db.droneID, drones);
+                            break;
+                        }
                     }
                 }
             }

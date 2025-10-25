@@ -51,6 +51,7 @@ void renderDronePage(SDL_Renderer *renderer, TTF_Font *font, const vector<Drone>
     y += rowHeight; // sang dòng dữ liệu
 
     //  Vẽ dữ liệu drone
+    droneButtons.clear();
     for (auto &d : drones)
     {
         x = startX;
@@ -111,6 +112,47 @@ void renderDronePage(SDL_Renderer *renderer, TTF_Font *font, const vector<Drone>
                    delBtn.y + (btnH - textH) / 2,
                    btnTextColor);
 
+        droneButtons.push_back({editBtn, delBtn, d.getDroneID()});
+
         y += rowHeight;
+    }
+}
+
+void handleEditDrone(const string &id, vector<Drone> &drones)
+{
+    for (auto &d : drones)
+    {
+        if (d.getDroneID() == id)
+        {
+            string newName;
+            float newSpeed;
+            int newBattery;
+            cout << "EDIT DRONE: " << id << endl;
+            cout << "New Name: ";
+            cin >> newName;
+            cout << "New Speed: ";
+            cin >> newSpeed;
+            cout << "New Battery: ";
+            cin >> newBattery;
+            d.setName(newName);
+            d.setSpeed(newSpeed);
+            d.setBattery(newBattery);
+            writeDronesToFile("D:/Drone-project/src/data/Drone.txt", drones);
+            break;
+        }
+    }
+}
+
+void handleDeleteDrone(const string &id, vector<Drone> &drones)
+{
+    for (int i = 0; i < drones.size(); i++)
+    {
+        if (drones[i].getDroneID() == id)
+        {
+            drones.erase(drones.begin() + i);
+            cout << "Deleted Drone" << id << endl;
+            writeDronesToFile("D:/Drone-project/src/data/Drone.txt", drones);
+            break;
+        }
     }
 }

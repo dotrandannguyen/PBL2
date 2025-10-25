@@ -12,20 +12,10 @@ float Task::getPathLength() const { return PathLength; }
 float Task::getDuration() const { return Duration; }
 string Task::getStatus() const { return Status; }
 
-void Task::setTaskID(const string& taskId) { TaskID = taskId; }
-void Task::setDroneID(const string& droneId) { DroneID = droneId; }
-void Task::setOrderID(const string& orderId) { OrderID = orderId; }
-void Task::setAlgorithmUsed(const string& algo) { AlgorithmUsed = algo; }
+void Task::setTaskID(const string &taskId) { TaskID = taskId; }
+void Task::setDroneID(const string &droneId) { DroneID = droneId; }
+void Task::setOrderID(const string &orderId) { OrderID = orderId; }
+void Task::setAlgorithmUsed(const string &algo) { AlgorithmUsed = algo; }
 void Task::setPathLength(float pathLen) { PathLength = pathLen; }
 void Task::setDuration(float duration) { Duration = duration; }
-void Task::setStatus(const string& status) { Status = status; }
-
-void Task::showInfo() const {
-    cout << "TaskID: " << TaskID
-         << "\nDroneID: " << DroneID
-         << "\nOrderID: " << OrderID
-         << "\nAlgorithmUsed: " << AlgorithmUsed
-         << "\nPathLength: " << PathLength
-         << "\nDuration: " << Duration
-         << "\nStatus: " << Status << endl;
-}
+void Task::setStatus(const string &status) { Status = status; }

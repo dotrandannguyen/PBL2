@@ -116,7 +116,7 @@ void assignOrdersGreedy(vector<Drone> &drones, vector<Order> &orders, const vect
             // lay toa do cau drone o node nao lam diem start -> sau nay bo sug class sau
             // string start = d.getCurrentNodeID(); // Drone luôn nằm trên node
 
-            vector<string> path = dijkstra(start, pickup); // tìm path từ node start -> diem lay hang
+            vector<string> path = astar(start, pickup); // tìm path từ node start -> diem lay hang
 
             if (path.empty())
                 continue;
@@ -135,7 +135,7 @@ void assignOrdersGreedy(vector<Drone> &drones, vector<Order> &orders, const vect
         if (bestDroneIndex != -1)
         {
             // Lấy path từ pickup -> dropoff (để drone bay tiếp sau khi lấy hàng)
-            vector<string> pickupToDrop = dijkstra(pickup, dropoff);
+            vector<string> pickupToDrop = astar(pickup, dropoff);
 
             // Gộp path từ drone->pickup + pickup->dropoff
             vector<string> fullPath = bestPathToPickUp;

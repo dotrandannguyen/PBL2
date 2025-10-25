@@ -12,6 +12,12 @@ AdjList buildAdjacencyList(const vector<Edge> &edges)
         adj[e.getEndNode()].push_back({e.getStartNode(), e.getDistance()}); // nếu vô hướng
     }
 
+    // ex
+    // adj = {
+    //     {"N01", {{"N02", 10.0}, {"N03", 5.0}}},
+    //     {"N02", {{"N01", 10.0}, {"N04", 2.0}}}
+    // };
+
     return adj;
 }
 

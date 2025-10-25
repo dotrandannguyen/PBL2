@@ -8,6 +8,7 @@
 #include "../../core/Drone.h"
 #include "../../core/Order.h"
 #include "../PathFinder/Dijkstra.h"
+#include "../PathFinder/AStar.h"
 
 using namespace std;
 
