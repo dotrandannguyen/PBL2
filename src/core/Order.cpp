@@ -59,3 +59,25 @@ void writeOrdersToFile(const string &filename, const Order &o)
 
     file.close();
 }
+
+void overWriteOrdersToFile(const string &filename, const vector<Order> &orders)
+{
+    ofstream file(filename);
+    if (!file.is_open())
+    {
+        cout << "Khong the ghi file: " << filename << endl;
+        return;
+    }
+
+    for (const auto &o : orders)
+    {
+        file << o.getOrderID() << " "
+             << o.getPickupLocation() << " "
+             << o.getDropoffLocation() << " "
+             << o.getWeight() << " "
+             << o.getPriority() << " "
+             << o.getStatus() << "\n";
+    }
+
+    file.close();
+}

@@ -8,6 +8,7 @@
 #include <iomanip>
 #include <iostream>
 #include "../../core/Drone.h"
+#include "../../core/Node.h"
 #include "../Renderer.h"
 
 struct DroneButton
@@ -21,6 +22,8 @@ struct DroneButton
 extern vector<DroneButton> droneButtons;
 
 void renderDronePage(SDL_Renderer *renderer, TTF_Font *font, const std::vector<Drone> &drones, int startX);
+
+void handleAddDrone(SDL_Renderer *renderer, int mx, int my, vector<Drone> &drones, const vector<Node> &nodes);
 
 void handleEditDrone(const string &id, vector<Drone> &drones);
 

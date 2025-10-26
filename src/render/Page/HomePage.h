@@ -16,7 +16,7 @@ extern bool isAddingNode;
 void renderHomePage(SDL_Renderer *renderer, TTF_Font *fontSmall, const std::vector<Drone> &drones, const std::vector<Node> &nodes, const std::vector<Edge> &edges);
 SDL_Point getDronePosXY(const std::string &pos);
 void handleHomePageDroneClick(SDL_Renderer *renderer, int mx, int my, vector<Drone> &drones, const vector<Node> &nodes);
-void handleAddDroneClick(int mx, int my, vector<Drone> &drones);
+// void handleAddDroneClick(int mx, int my, vector<Drone> &drones);
 
 void handleHomePageNodeClick(SDL_Renderer *renderer, int mx, int my);
 void handleAddNodeClick(int mx, int my, vector<Node> &nodes, vector<Edge> &edges);

@@ -8,6 +8,7 @@
 #include "core/Drone.h"
 #include "core/Order.h"
 #include "render/Page/OrderPage.h"
+#include "render/Page/TaskPage.h"
 #include "render/Page/HomePage.h"
 #include "render/Page/DronePage.h"
 #include "algorithm/PathFinder/Dijkstra.h"
@@ -31,6 +32,7 @@ struct Button
 };
 
 vector<DroneButton> droneButtons;
+vector<OrderButton> orderButtons;
 
 int main(int argc, char *argv[])
 {
@@ -151,9 +153,24 @@ int main(int argc, char *argv[])
 
                         handleAddOrder(orders);
                     }
+
+                    for (auto &ob : orderButtons)
+                    {
+                        if (isMouseInside(ob.editBtn, mx, my))
+                        {
+                            handleEditOrder(ob.OrderID, orders);
+                            break;
+                        }
+                        else if (isMouseInside(ob.delBtn, mx, my))
+                        {
+                            handleDeleteOrder(ob.OrderID, orders);
+                            break;
+                        }
+                    }
                 }
                 else if (currentPage == "Drone")
                 {
+                    handleAddDrone(renderer, mx, my, drones, nodes);
                     for (auto &db : droneButtons)
                     {
                         if (isMouseInside(db.editBtn, mx, my))
@@ -264,6 +281,11 @@ int main(int argc, char *argv[])
 
             renderOrderPage(renderer, font, orders, contentX);
         }
+
+        // else if (currentPage == "Task")
+        // {
+        //     renderTaskPage(renderer, font, contentX);
+        // }
 
         SDL_RenderPresent(renderer);
     }

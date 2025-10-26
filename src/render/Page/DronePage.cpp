@@ -18,6 +18,21 @@ void renderDronePage(SDL_Renderer *renderer, TTF_Font *font, const vector<Drone>
     int winW, winH;
     SDL_GetRendererOutputSize(renderer, &winW, &winH);
 
+    // add button
+    int btnAddW = 140;
+    int btnAddH = 40;
+    SDL_Rect addBtn = {winW - btnAddW - 30, 15, btnAddW, btnAddH};
+    SDL_Color addBtnColor = {40, 167, 69, 255};
+    SDL_Color addBtnText = {255, 255, 255, 255};
+    SDL_SetRenderDrawColor(renderer, addBtnColor.r, addBtnColor.g, addBtnColor.b, 255);
+    SDL_RenderFillRect(renderer, &addBtn);
+    int textW, textH;
+    TTF_SizeText(font, "+ Add Drone", &textW, &textH);
+    renderText(renderer, font, "+ Add Drone",
+               addBtn.x + (btnAddW - textW) / 2,
+               addBtn.y + (btnAddH - textH) / 2,
+               addBtnText);
+
     //  Header
     vector<string> headers = {"DroneID", "Name", "Position", "Speed", "Battery", "Status", "Actions"};
     vector<int> colWidths = {
@@ -115,6 +130,44 @@ void renderDronePage(SDL_Renderer *renderer, TTF_Font *font, const vector<Drone>
         droneButtons.push_back({editBtn, delBtn, d.getDroneID()});
 
         y += rowHeight;
+    }
+}
+
+void handleAddDrone(SDL_Renderer *renderer, int mx, int my, vector<Drone> &drones, const vector<Node> &nodes)
+{
+    int w, h;
+    SDL_GetRendererOutputSize(renderer, &w, &h);
+    int idNum = drones.size() + 1;
+    string newID = "D00" + to_string(idNum);
+    string name = "Drone_" + to_string(idNum);
+
+    int btnAddW = 140;
+    int btnAddH = 40;
+    SDL_Rect addBtn = {w - btnAddW - 30, 15, btnAddW, btnAddH};
+    // Mặc định spawn ở node 1 hoặc node 2
+    if (isMouseInside(addBtn, mx, my))
+    {
+        string startNodeID;
+        if (idNum % 2 == 1)
+            startNodeID = "N01";
+        else
+            startNodeID = "N02";
+
+        // Tìm tọa độ node tương ứng
+        float x = 0, y = 0;
+        for (auto &n : nodes)
+        {
+            if (n.getNodeID() == startNodeID)
+            {
+                x = n.getX();
+                y = n.getY();
+                break;
+            }
+        }
+        Drone newDrone(newID, name, x, y, 100.0f, 200, "idle", startNodeID);
+
+        drones.push_back(newDrone);
+        writeDronesToFile("D:/Drone-project/src/data/Drone.txt", drones);
     }
 }
 

@@ -65,6 +65,9 @@ void renderOrderPage(SDL_Renderer *renderer, TTF_Font *font, const vector<Order>
 
     y += rowHeight; // xuong dong
 
+    // ve lai order button
+    orderButtons.clear();
+
     for (auto &o : orders)
     {
         x = startX;
@@ -130,6 +133,8 @@ void renderOrderPage(SDL_Renderer *renderer, TTF_Font *font, const vector<Order>
                    delBtn.y + (btnHeight - textH) / 2,
                    btnTextColor);
 
+        orderButtons.push_back({editBtn, delBtn, o.getOrderID()});
+
         y += rowHeight;
     }
 }
@@ -155,4 +160,46 @@ void handleAddOrder(vector<Order> &orders)
     // cout << "[DEBUG AFTER ADD] orders.size() = " << orders.size() << endl;
     // for (auto &o : orders)
     //     cout << o.getOrderID() << " " << o.getStatus() << endl;
+}
+
+void handleEditOrder(const string &id, vector<Order> &orders)
+{
+    for (auto &o : orders)
+    {
+        if (o.getOrderID() == id)
+        {
+            string newPickUp, newDropOff;
+            float newWeight;
+            string newPriority;
+            cout << "EDIT ORDER: " << id << endl;
+            cout << "New PickUp: ";
+            cin >> newPickUp;
+            cout << "New DropOff: ";
+            cin >> newDropOff;
+            cout << "New Weight: ";
+            cin >> newWeight;
+            cout << "New Priority: ";
+            cin >> newPriority;
+            o.setPickupLocation(newPickUp);
+            o.setDropoffLocation(newDropOff);
+            o.setWeight(newWeight);
+            o.setPriority(newPriority);
+            overWriteOrdersToFile("D:/Drone-project/src/data/Orders.txt", orders);
+            break;
+        }
+    }
+}
+
+void handleDeleteOrder(const string &id, vector<Order> &orders)
+{
+    for (int i = 0; i < orders.size(); i++)
+    {
+        if (orders[i].getOrderID() == id)
+        {
+            orders.erase(orders.begin() + i);
+            cout << "Deleted Order" << id << endl;
+            overWriteOrdersToFile("D:/Drone-project/src/data/Orders.txt", orders);
+            break;
+        }
+    }
 }

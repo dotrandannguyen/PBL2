@@ -12,10 +12,20 @@
 using namespace std;
 
 extern bool isAddingOrder;
-extern vector<Drone> drones; // hoặc truyền vào tham số nếu bạn dùng scope khác
-extern vector<Node> nodes;
-extern vector<Edge> edges;
 
-void renderOrderPage(SDL_Renderer *renderer, TTF_Font *font, const std::vector<Order> &orders, int startX);
+struct OrderButton
+{
+    SDL_Rect editBtn;
+    SDL_Rect delBtn;
+    string OrderID;
+};
+
+extern vector<OrderButton> orderButtons;
+
+void renderOrderPage(SDL_Renderer *renderer, TTF_Font *font, const vector<Order> &orders, int startX);
 
 void handleAddOrder(vector<Order> &orders);
+
+void handleEditOrder(const string &id, vector<Order> &orders);
+
+void handleDeleteOrder(const string &id, vector<Order> &orders);
