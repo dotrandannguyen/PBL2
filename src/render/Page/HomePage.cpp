@@ -1,5 +1,8 @@
 #include "HomePage.h"
 
+// Biến toàn cục để lưu drone nào đang được chọn
+int selectedDroneIndex = -1;
+
 SDL_Point getDronePosXY(const string &pos)
 {
     if (pos.size() < 2)
@@ -19,39 +22,50 @@ void renderHomePage(SDL_Renderer *renderer, TTF_Font *fontSmall, const std::vect
     SDL_Color textColor = {0, 0, 0, 255};
 
     // Vẽ từng drone
-    for (auto &d : drones)
+    for (size_t i = 0; i < drones.size(); ++i)
     {
+        const auto &d = drones[i];
         SDL_Rect droneRect = {static_cast<int>(d.getX()), static_cast<int>(d.getY()), 20, 20};
 
+        // Màu drone theo trạng thái
         if (d.getStatus() == "idle")
             SDL_SetRenderDrawColor(renderer, 0, 200, 0, 255);
-        else if (d.getStatus() == "busy")
+        else if (d.getStatus() == "moving")
             SDL_SetRenderDrawColor(renderer, 255, 165, 0, 255);
         else
             SDL_SetRenderDrawColor(renderer, 0, 100, 255, 255);
 
+        // Nếu là drone được chọn thì thêm viền xanh dương
+        if (static_cast<int>(i) == selectedDroneIndex)
+        {
+            SDL_SetRenderDrawColor(renderer, 0, 0, 255, 255);
+            SDL_Rect outline = {droneRect.x - 2, droneRect.y - 2, droneRect.w + 4, droneRect.h + 4};
+            SDL_RenderDrawRect(renderer, &outline);
+        }
+
         SDL_RenderFillRect(renderer, &droneRect);
 
-        // Hiển thị DroneID bên cạnh
-        renderText(renderer, fontSmall, d.getDroneID(),
-                   static_cast<int>(d.getX()) - 5,
-                   static_cast<int>(d.getY()) - 20,
-                   textColor);
+        // Chỉ hiển thị DroneID nếu drone đang được chọn
+        if (static_cast<int>(i) == selectedDroneIndex)
+        {
+            renderText(renderer, fontSmall, d.getDroneID(),
+                       static_cast<int>(d.getX()) + 25,
+                       static_cast<int>(d.getY()) - 5,
+                       textColor);
+        }
     }
-
     // vẽ từng node
     for (auto &n : nodes)
     {
-        SDL_Rect nodeRect = {static_cast<int>(n.getX()), static_cast<int>(n.getY()), 20, 20};
+        SDL_Rect nodeRect = {static_cast<int>(n.getX()), static_cast<int>(n.getY()), 14, 14};
         SDL_SetRenderDrawColor(renderer, 200, 0, 0, 255); // Node màu đỏ
         SDL_RenderFillRect(renderer, &nodeRect);
 
         renderText(renderer, fontSmall, n.getNodeID(),
                    static_cast<int>(n.getX()) - 5,
-                   static_cast<int>(n.getY()) - 20,
+                   static_cast<int>(n.getY()) - 18,
                    textColor);
     }
-
     // vẽ các cạnh giữa các node
     for (auto &e : edges)
     {
@@ -132,7 +146,25 @@ void handleHomePageDroneClick(SDL_Renderer *renderer, int mx, int my, vector<Dro
 
         drones.push_back(newDrone);
         writeDronesToFile("D:/Drone-project/src/data/Drone.txt", drones);
+        return;
     }
+    // Kiểm tra click vào drone nào đó
+    bool clickedOnDrone = false;
+    for (size_t i = 0; i < drones.size(); ++i)
+    {
+        SDL_Rect droneRect = {static_cast<int>(drones[i].getX()), static_cast<int>(drones[i].getY()), 20, 20};
+        if (mx >= droneRect.x && mx <= droneRect.x + droneRect.w &&
+            my >= droneRect.y && my <= droneRect.y + droneRect.h)
+        {
+            selectedDroneIndex = static_cast<int>(i);
+            clickedOnDrone = true;
+            break;
+        }
+    }
+
+    // Nếu không click vào drone nào -> bỏ chọn
+    if (!clickedOnDrone)
+        selectedDroneIndex = -1;
 }
 
 // // Xử lý click chọn vị trí drone mới
