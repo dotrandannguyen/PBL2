@@ -94,6 +94,8 @@ int main(int argc, char *argv[])
     bool quit = false;
     bool sidebarVisible = true;
     bool isMoving = false;
+    bool hasStart = false;    // check xem drone đã tab chạy lần nào chưa
+    bool hasNewOrder = false; // check xem có đơn hàng mới ko
     auto lastTime = chrono::high_resolution_clock::now();
     SDL_Event e;
 
@@ -153,7 +155,7 @@ int main(int argc, char *argv[])
                     {
 
                         handleAddOrder(orders);
-                        isMoving = false; // cho phep drone chay lai khi co don moi duoc them vao
+                        hasNewOrder = true; // cho phep drone chay lai khi co don moi duoc them vao
                     }
 
                     for (auto &ob : orderButtons)
@@ -210,14 +212,40 @@ int main(int argc, char *argv[])
                     }
                     lastTime = chrono::high_resolution_clock::now();
                     isMoving = true;
+                    hasStart = true;
 
-                    // ---- Gọi Greedy assign Orders cho drones ----
+                    //  Gọi Greedy assign Orders cho drones
 
                     assignOrdersGreedy(drones, orders, nodes, edges);
+                    cout << "[DEBUG] assignOrdersGreedy trong while duoc goi!" << endl;
                 }
             }
         }
+        if (hasStart && hasNewOrder)
+        {
+            if (currentPage == "Home")
+            {
+                bool hasPendingOrder = false;
+                for (const auto &o : orders)
+                {
+                    if (o.getStatus() != "moving")
+                    {
+                        hasPendingOrder = true;
+                        break;
+                    }
+                }
 
+                if (hasPendingOrder)
+                {
+                    cout << "[SYSTEM] Co don hang moi, khoi dong lai drone\n";
+                    cout << "[DEBUG] assignOrdersGreedy trong newOrder duoc goi!" << endl;
+                    assignOrdersGreedy(drones, orders, nodes, edges);
+                    isMoving = true;
+                    hasNewOrder = false;
+                    lastTime = chrono::high_resolution_clock::now();
+                }
+            }
+        }
         // Vẽ nền
         SDL_SetRenderDrawColor(renderer, bgColor.r, bgColor.g, bgColor.b, 255);
         SDL_RenderClear(renderer);
@@ -278,6 +306,7 @@ int main(int argc, char *argv[])
                 }
                 if (anyFinished)
                 {
+                    cout << "[DEBUG] assignOrdersGreedy trong Finished duoc goi!" << endl;
                     assignOrdersGreedy(drones, orders, nodes, edges);
                 }
             }
