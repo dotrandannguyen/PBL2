@@ -1,7 +1,26 @@
 #include "Task.h"
 
+Task::Task(string taskId, Drone *d, Order *o, string algo, float pathLen, float duration, string status)
+    : TaskID(taskId),
+      dronePtr(d),
+      orderPtr(o),
+      DroneID(d ? d->getDroneID() : ""),
+      OrderID(o ? o->getOrderID() : ""),
+      AlgorithmUsed(algo),
+      PathLength(pathLen),
+      Duration(duration),
+      Status(status) {}
+
 Task::Task(string taskId, string droneId, string orderId, string algo, float pathLen, float duration, string status)
-    : TaskID(taskId), DroneID(droneId), OrderID(orderId), AlgorithmUsed(algo), PathLength(pathLen), Duration(duration), Status(status) {}
+    : TaskID(taskId),
+      DroneID(droneId),
+      OrderID(orderId),
+      AlgorithmUsed(algo),
+      PathLength(pathLen),
+      Duration(duration),
+      Status(status),
+      dronePtr(nullptr),
+      orderPtr(nullptr) {}
 
 string Task::getTaskID() const { return TaskID; }
 string Task::getDroneID() const { return DroneID; }
@@ -25,7 +44,7 @@ vector<Task> readTasksFromFile(const string &filename)
     ifstream file(filename);
     if (!file.is_open())
     {
-        cout << "khong the doc duoc file task: " << filename << endl;
+        cout << "Khong the doc duoc file task: " << filename << endl;
         return tasks;
     }
 
@@ -35,7 +54,7 @@ vector<Task> readTasksFromFile(const string &filename)
     {
         tasks.emplace_back(task_id, drone_id, order_id, algorithm, path_length, duration, status);
     }
-    // emplace_back tiết kiệm bước tạo tạm, trực tiếp dựng đối tượng trong vector → nhanh hơn và gọn hơn.
+
     file.close();
     return tasks;
 }
@@ -60,4 +79,29 @@ void writeTasksToFile(const string &filename, const vector<Task> &tasks)
              << t.getStatus() << "\n";
     }
     file.close();
+}
+
+// Liên kết lại con trỏ Task <-> Drone, Order sau khi đọc file
+void linkTasksWithPointers(vector<Task> &tasks, vector<Drone> &drones, vector<Order> &orders)
+{
+    for (auto &task : tasks)
+    {
+        for (auto &d : drones)
+        {
+            if (d.getDroneID() == task.getDroneID())
+            {
+                task.setDrone(&d);
+                break;
+            }
+        }
+
+        for (auto &o : orders)
+        {
+            if (o.getOrderID() == task.getOrderID())
+            {
+                task.setOrder(&o);
+                break;
+            }
+        }
+    }
 }

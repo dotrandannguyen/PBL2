@@ -23,6 +23,7 @@ vector<Drone> drones = readDronesFromFile("D:/Drone-project/src/data/Drone.txt")
 vector<Node> nodes = readNodesFromFile("D:/Drone-project/src/data/Node.txt");
 vector<Edge> edges = readEdgesFromFile("D:/Drone-project/src/data/Edge.txt");
 vector<Order> orders = readOrdersFromFile("D:/Drone-project/src/data/Orders.txt");
+vector<Task> tasks = readTasksFromFile("D:/Drone-project/src/data/Task.txt");
 
 struct Button
 {
@@ -152,6 +153,7 @@ int main(int argc, char *argv[])
                     {
 
                         handleAddOrder(orders);
+                        isMoving = false; // cho phep drone chay lai khi co don moi duoc them vao
                     }
 
                     for (auto &ob : orderButtons)
@@ -183,6 +185,16 @@ int main(int argc, char *argv[])
                             handleDeleteDrone(db.droneID, drones);
                             break;
                         }
+                    }
+                }
+                else if (currentPage == "Task")
+                {
+                    int winW, winH;
+                    SDL_GetRendererOutputSize(renderer, &winW, &winH);
+                    SDL_Rect addBtn = {winW - 140 - 30, 15, 140, 40};
+                    if (isMouseInside(addBtn, mx, my))
+                    {
+                        handleAddTask(tasks, drones, orders);
                     }
                 }
             }
@@ -282,10 +294,10 @@ int main(int argc, char *argv[])
             renderOrderPage(renderer, font, orders, contentX);
         }
 
-        // else if (currentPage == "Task")
-        // {
-        //     renderTaskPage(renderer, font, contentX);
-        // }
+        else if (currentPage == "Task")
+        {
+            renderTaskPage(renderer, font, tasks, contentX);
+        }
 
         SDL_RenderPresent(renderer);
     }

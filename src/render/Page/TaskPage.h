@@ -8,8 +8,18 @@
 #include <iomanip>
 #include <iostream>
 #include "../../core/Drone.h"
+#include "../../core/Task.h"
 #include "../Renderer.h"
 
-void renderTaskPage(SDL_Renderer *renderer, TTF_Font *font, int startX);
+struct TaskButton
+{
+    SDL_Rect activateBtn;
+    string taskID;
+};
+
+extern vector<TaskButton> taskButtons;
+
+void renderTaskPage(SDL_Renderer *renderer, TTF_Font *font, const vector<Task> &tasks, int startX);
+void handleAddTask(vector<Task> &tasks, vector<Drone> &drones, vector<Order> &orders);
 
 #endif

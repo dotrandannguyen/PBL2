@@ -12,8 +12,8 @@ using namespace std;
 class Task
 {
 private:
-    Drone *ptr = nullptr;
-    Order *ptr = nullptr;
+    Drone *dronePtr = nullptr;
+    Order *orderPtr = nullptr;
     string TaskID;
     string DroneID;       // ref Drone.DroneID
     string OrderID;       // ref Order.OrderID
@@ -24,9 +24,12 @@ private:
 
 public:
     Task() = default;
+    Task(string taskId, Drone *d, Order *o, string algo, float pathLen, float duration, string status);
+    // Constructor đọc file (chỉ lưu ID, chưa có con trỏ)
     Task(string taskId, string droneId, string orderId, string algo, float pathLen, float duration, string status);
-
     // Getter
+    Drone *getDrone() const { return dronePtr; }
+    Order *getOrder() const { return orderPtr; }
     string getTaskID() const;
     string getDroneID() const;
     string getOrderID() const;
@@ -36,6 +39,18 @@ public:
     string getStatus() const;
 
     // Setter
+    void setDrone(Drone *d)
+    {
+        dronePtr = d;
+        if (d)
+            DroneID = d->getDroneID();
+    }
+    void setOrder(Order *o)
+    {
+        orderPtr = o;
+        if (o)
+            OrderID = o->getOrderID();
+    }
     void setTaskID(const string &taskId);
     void setDroneID(const string &droneId);
     void setOrderID(const string &orderId);
@@ -47,5 +62,6 @@ public:
 
 vector<Task> readTasksFromFile(const string &filename);
 void writeTasksToFile(const string &filename, const vector<Task> &Tasks);
+void linkTasksWithPointers(vector<Task> &tasks, vector<Drone> &drones, vector<Order> &orders);
 
 #endif

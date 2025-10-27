@@ -1,0 +1,3 @@
+T1 D002 O1 Astar 100 15 assigned
+T2 D001 O1 Astar 100 15 assigned
+T3 D001 O1 Astar 100 15 assigned
