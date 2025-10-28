@@ -18,6 +18,7 @@ int Drone::getBattery() const { return Battery; }
 string Drone::getStatus() const { return Status; }
 string Drone::getCurrentNodeID() const { return currentNodeID; }
 bool Drone::getFinished() const { return justFinished; }
+string Drone::getAssignedOrderID() const { return assignedOrderID; }
 // Setter
 void Drone::setDroneID(const string &id) { DroneID = id; }
 void Drone::setName(const string &name) { Name = name; }
@@ -35,6 +36,11 @@ void Drone::setFinished(const bool &value)
     justFinished = value;
 }
 
+void Drone::setAssignedOrderID(const string &id)
+{
+    assignedOrderID = id;
+}
+
 void Drone::setPath(const vector<Node> &nodes)
 {
     path = nodes;
@@ -48,32 +54,6 @@ void Drone::setPath(const vector<Node> &nodes)
         }
         setStatus("moving");
     }
-}
-
-// Đọc file
-vector<Drone> readDronesFromFile(const string &filename)
-{
-    // cout << "[DEBUG] readDronesFromFile() duoc goi!" << endl;
-    vector<Drone> drones;
-    ifstream file(filename);
-    if (!file.is_open())
-    {
-        cerr << "Khong the doc file: " << filename << endl;
-        return drones;
-    }
-
-    string id, name, status;
-    float x, y, speed;
-    int battery;
-    string currentNodeID;
-
-    while (file >> id >> name >> x >> y >> speed >> battery >> status >> currentNodeID)
-    {
-        drones.emplace_back(id, name, x, y, speed, battery, status, currentNodeID);
-    }
-
-    file.close();
-    return drones;
 }
 
 // Hàm updateMove(deltaTime)
@@ -123,6 +103,32 @@ bool Drone::updateMove(float deltaTime)
     // // ---------
 
     return true;
+}
+
+// Đọc file
+vector<Drone> readDronesFromFile(const string &filename)
+{
+    // cout << "[DEBUG] readDronesFromFile() duoc goi!" << endl;
+    vector<Drone> drones;
+    ifstream file(filename);
+    if (!file.is_open())
+    {
+        cerr << "Khong the doc file: " << filename << endl;
+        return drones;
+    }
+
+    string id, name, status;
+    float x, y, speed;
+    int battery;
+    string currentNodeID;
+
+    while (file >> id >> name >> x >> y >> speed >> battery >> status >> currentNodeID)
+    {
+        drones.emplace_back(id, name, x, y, speed, battery, status, currentNodeID);
+    }
+
+    file.close();
+    return drones;
 }
 
 // Ghi file

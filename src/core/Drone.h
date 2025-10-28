@@ -16,6 +16,7 @@ private:
     int Battery;
     string Status;
     string currentNodeID;
+    string assignedOrderID; // dinh kem orderid
 
     // check drone da bay xong chua
     bool justFinished = false;
@@ -38,6 +39,7 @@ public:
     string getStatus() const;
     string getCurrentNodeID() const;
     bool getFinished() const;
+    string getAssignedOrderID() const;
     // Setter
     void setDroneID(const string &id);
     void setName(const string &name);
@@ -47,6 +49,7 @@ public:
     void setStatus(const string &status);
     void setCurrentNodeID(const string &id);
     void setFinished(const bool &value);
+    void setAssignedOrderID(const string &id);
 
     void setPath(const vector<Node> &nodes);
     bool updateMove(float deltaTime);

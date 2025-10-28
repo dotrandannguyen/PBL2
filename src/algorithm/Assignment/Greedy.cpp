@@ -206,7 +206,8 @@ void assignOrdersGreedy(vector<Drone> &drones, vector<Order> &orders, const vect
             vector<Node> fullNodePath = convertPathToNodes(fullPath, nodes);
             d.setPath(fullNodePath);
             d.setStatus("moving");
-            o.setStatus("moving"); // đánh dấu order đã được gán
+            d.setAssignedOrderID(o.getOrderID()); // lien ket order voi drone lien ket 1-1
+            o.setStatus("moving");                // đánh dấu order đã được gán
         }
     }
 }

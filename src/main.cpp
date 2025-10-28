@@ -20,6 +20,7 @@ using namespace std;
 bool isAddingDrone = false;
 bool isAddingNode = false;
 bool isAddingOrder = false;
+bool showInfoPanel = false;
 
 vector<Drone> drones = readDronesFromFile("D:/Drone-project/src/data/Drone.txt");
 vector<Node> nodes = readNodesFromFile("D:/Drone-project/src/data/Node.txt");
@@ -139,7 +140,9 @@ int main(int argc, char *argv[])
                 // Xử lý click trang Home
                 if (currentPage == "Home")
                 {
+                    hanldeHomePageInfoClick(renderer, mx, my);
                     handleHomePageDroneClick(renderer, mx, my, drones, nodes);
+
                     if (isAddingNode)
                     {
                         handleAddNodeClick(mx, my, nodes, edges);
@@ -289,7 +292,7 @@ int main(int argc, char *argv[])
 
         if (currentPage == "Home")
         {
-            renderHomePage(renderer, fontSmall, drones, nodes, edges);
+            renderHomePage(renderer, fontSmall, drones, nodes, edges, orders);
 
             if (isMoving)
             {

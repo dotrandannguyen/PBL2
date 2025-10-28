@@ -17,43 +17,10 @@ SDL_Point getDronePosXY(const string &pos)
     return {baseX + 100, baseY + 100};
 }
 
-void renderHomePage(SDL_Renderer *renderer, TTF_Font *fontSmall, const std::vector<Drone> &drones, const std::vector<Node> &nodes, const std::vector<Edge> &edges)
+void renderHomePage(SDL_Renderer *renderer, TTF_Font *fontSmall, const vector<Drone> &drones, const vector<Node> &nodes, const vector<Edge> &edges, const vector<Order> &orders)
 {
     SDL_Color textColor = {0, 0, 0, 255};
 
-    // Vẽ từng drone
-    for (size_t i = 0; i < drones.size(); ++i)
-    {
-        const auto &d = drones[i];
-        SDL_Rect droneRect = {static_cast<int>(d.getX()), static_cast<int>(d.getY()), 20, 20};
-
-        // Màu drone theo trạng thái
-        if (d.getStatus() == "idle")
-            SDL_SetRenderDrawColor(renderer, 0, 200, 0, 255);
-        else if (d.getStatus() == "moving")
-            SDL_SetRenderDrawColor(renderer, 255, 165, 0, 255);
-        else
-            SDL_SetRenderDrawColor(renderer, 0, 100, 255, 255);
-
-        // Nếu là drone được chọn thì thêm viền xanh dương
-        if (static_cast<int>(i) == selectedDroneIndex)
-        {
-            SDL_SetRenderDrawColor(renderer, 0, 0, 255, 255);
-            SDL_Rect outline = {droneRect.x - 2, droneRect.y - 2, droneRect.w + 4, droneRect.h + 4};
-            SDL_RenderDrawRect(renderer, &outline);
-        }
-
-        SDL_RenderFillRect(renderer, &droneRect);
-
-        // Chỉ hiển thị DroneID nếu drone đang được chọn
-        if (static_cast<int>(i) == selectedDroneIndex)
-        {
-            renderText(renderer, fontSmall, d.getDroneID(),
-                       static_cast<int>(d.getX()) + 25,
-                       static_cast<int>(d.getY()) - 5,
-                       textColor);
-        }
-    }
     // vẽ từng node
     for (auto &n : nodes)
     {
@@ -91,6 +58,71 @@ void renderHomePage(SDL_Renderer *renderer, TTF_Font *fontSmall, const std::vect
         }
     }
 
+    // Vẽ từng drone
+
+    for (size_t i = 0; i < drones.size(); ++i)
+    {
+        const auto &d = drones[i];
+        SDL_Rect droneRect = {static_cast<int>(d.getX()), static_cast<int>(d.getY()), 20, 20};
+
+        //  Tô thân drone theo trạng thái
+        if (d.getStatus() == "idle")
+            SDL_SetRenderDrawColor(renderer, 0, 200, 0, 255); // xanh lá
+        else if (d.getStatus() == "moving")
+            SDL_SetRenderDrawColor(renderer, 255, 165, 0, 255); // cam
+        else
+            SDL_SetRenderDrawColor(renderer, 0, 100, 255, 255); // xanh dương
+
+        SDL_RenderFillRect(renderer, &droneRect);
+
+        // Nếu được chọn → vẽ viền đen
+        if (static_cast<int>(i) == selectedDroneIndex)
+        {
+            SDL_SetRenderDrawColor(renderer, 0, 0, 0, 255);
+            SDL_RenderDrawRect(renderer, &droneRect);
+        }
+
+        //  Panel thông tin
+        if (static_cast<int>(i) == selectedDroneIndex)
+        {
+            int panelW = 100;
+            int panelH = 75;
+            int panelX = static_cast<int>(d.getX()) + droneRect.w / 2 - panelW / 2;
+            int panelY = static_cast<int>(d.getY()) - panelH - 10;
+
+            SDL_Rect panelRect = {panelX, panelY, panelW, panelH};
+            SDL_SetRenderDrawColor(renderer, 255, 224, 189, 230); // màu da nhạt
+            SDL_RenderFillRect(renderer, &panelRect);
+            SDL_SetRenderDrawColor(renderer, 0, 0, 0, 255);
+            SDL_RenderDrawRect(renderer, &panelRect);
+
+            SDL_Color textColor = {0, 0, 0, 255};
+            int textX = panelX + 10;
+            int textY = panelY + 8;
+
+            renderText(renderer, fontSmall, "Drone: " + d.getDroneID(), textX, textY, textColor);
+            textY += 12;
+            renderText(renderer, fontSmall, "Status: " + d.getStatus(), textX, textY, textColor);
+            textY += 12;
+            renderText(renderer, fontSmall, "Battery: " + to_string(d.getBattery()) + "%", textX, textY, textColor);
+            textY += 13;
+            renderText(renderer, fontSmall,
+                       "Pos: (" + to_string((int)d.getX()) + ", " + to_string((int)d.getY()) + ")",
+                       textX, textY, textColor);
+
+            if (!d.getAssignedOrderID().empty())
+            {
+                textY += 12;
+                renderText(renderer, fontSmall, "Order: " + d.getAssignedOrderID(), textX, textY, textColor);
+            }
+
+            renderText(renderer, fontSmall, d.getDroneID(),
+                       static_cast<int>(d.getX()) + 25,
+                       static_cast<int>(d.getY()) - 5,
+                       textColor);
+        }
+    }
+
     // Lấy kích thước cửa sổ
     int w, h;
     SDL_GetRendererOutputSize(renderer, &w, &h);
@@ -106,6 +138,56 @@ void renderHomePage(SDL_Renderer *renderer, TTF_Font *fontSmall, const std::vect
     SDL_SetRenderDrawColor(renderer, 255, 100, 0, 255);
     SDL_RenderFillRect(renderer, &addNodeBtn);
     renderText(renderer, fontSmall, "Add Node", addNodeBtn.x + 10, addNodeBtn.y + 10, {255, 255, 255, 255});
+
+    // Vẽ nút Info (toggle panel)
+    SDL_Rect infoBtn = {w - 80, 20, 60, 30};
+    SDL_SetRenderDrawColor(renderer, 50, 150, 255, 255);
+    SDL_RenderFillRect(renderer, &infoBtn);
+    renderText(renderer, fontSmall, "Info", infoBtn.x + 10, infoBtn.y + 5, {255, 255, 255, 255});
+
+    if (showInfoPanel)
+    {
+        int infoW = 280, infoH = 220;
+        SDL_Rect infoBox = {w - infoW - 20, 60, infoW, infoH};
+
+        SDL_SetRenderDrawColor(renderer, 255, 224, 189, 230);
+        SDL_RenderFillRect(renderer, &infoBox);
+        SDL_SetRenderDrawColor(renderer, 0, 0, 0, 255);
+        SDL_RenderDrawRect(renderer, &infoBox);
+
+        renderText(renderer, fontSmall, "Active Tasks", infoBox.x + 10, infoBox.y + 10, {0, 0, 0, 255});
+
+        int y = infoBox.y + 35;
+        bool hasActive = false;
+
+        for (const auto &d : drones)
+        {
+            if (d.getStatus() == "moving")
+            {
+                hasActive = true;
+                string oid = d.getAssignedOrderID();
+                const Order *o = nullptr;
+
+                for (const auto &ord : orders)
+                    if (ord.getOrderID() == oid)
+                        o = &ord;
+
+                if (o)
+                {
+                    renderText(renderer, fontSmall, "Drone: " + d.getDroneID(), infoBox.x + 10, y, {0, 0, 0, 255});
+                    y += 20;
+                    renderText(renderer, fontSmall, "Order: " + o->getOrderID(), infoBox.x + 10, y, {0, 0, 0, 255});
+                    y += 20;
+                    renderText(renderer, fontSmall, "From " + o->getPickupLocation() + " -> " + o->getDropoffLocation(),
+                               infoBox.x + 10, y, {0, 0, 0, 255});
+                    y += 30;
+                }
+            }
+        }
+
+        if (!hasActive)
+            renderText(renderer, fontSmall, "No active deliveries", infoBox.x + 10, y, {100, 100, 100, 255});
+    }
 }
 
 // Xử lý click nút Add Drone
@@ -165,6 +247,17 @@ void handleHomePageDroneClick(SDL_Renderer *renderer, int mx, int my, vector<Dro
     // Nếu không click vào drone nào -> bỏ chọn
     if (!clickedOnDrone)
         selectedDroneIndex = -1;
+}
+
+void hanldeHomePageInfoClick(SDL_Renderer *renderer, int mx, int my)
+{
+    int w, h;
+    SDL_GetRendererOutputSize(renderer, &w, &h);
+    SDL_Rect infoBtn = {w - 80, 20, 60, 30};
+    if (isMouseInside(infoBtn, mx, my))
+    {
+        showInfoPanel = !showInfoPanel; // Đảo trạng thái hiển thị
+    }
 }
 
 // // Xử lý click chọn vị trí drone mới
