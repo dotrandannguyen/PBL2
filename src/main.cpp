@@ -11,8 +11,10 @@
 #include "render/Page/TaskPage.h"
 #include "render/Page/HomePage.h"
 #include "render/Page/DronePage.h"
+#include "render/Page/NotificationPage.h"
 #include "algorithm/PathFinder/Dijkstra.h"
 #include "algorithm/Assignment/Greedy.h"
+#include "utils/notification.h"
 using namespace std;
 
 bool isAddingDrone = false;
@@ -34,6 +36,7 @@ struct Button
 
 vector<DroneButton> droneButtons;
 vector<OrderButton> orderButtons;
+vector<string> notifications;
 
 int main(int argc, char *argv[])
 {
@@ -217,7 +220,8 @@ int main(int argc, char *argv[])
                     //  Gọi Greedy assign Orders cho drones
 
                     assignOrdersGreedy(drones, orders, nodes, edges);
-                    cout << "[DEBUG] assignOrdersGreedy trong while duoc goi!" << endl;
+
+                    logMessage("[DEBUG] assignOrdersGreedy trong while duoc goi!");
                 }
             }
         }
@@ -237,7 +241,7 @@ int main(int argc, char *argv[])
 
                 if (hasPendingOrder)
                 {
-                    cout << "[SYSTEM] Co don hang moi, khoi dong lai drone\n";
+                    logMessage("[SYSTEM] Co don hang moi, khoi dong lai drone\n");
                     cout << "[DEBUG] assignOrdersGreedy trong newOrder duoc goi!" << endl;
                     assignOrdersGreedy(drones, orders, nodes, edges);
                     isMoving = true;
@@ -306,7 +310,8 @@ int main(int argc, char *argv[])
                 }
                 if (anyFinished)
                 {
-                    cout << "[DEBUG] assignOrdersGreedy trong Finished duoc goi!" << endl;
+
+                    logMessage("[DEBUG] assignOrdersGreedy trong Finished duoc goi!");
                     assignOrdersGreedy(drones, orders, nodes, edges);
                 }
             }
@@ -326,6 +331,10 @@ int main(int argc, char *argv[])
         else if (currentPage == "Task")
         {
             renderTaskPage(renderer, font, tasks, contentX);
+        }
+        else if (currentPage == "Notification")
+        {
+            renderNotificationPage(renderer, font, notifications);
         }
 
         SDL_RenderPresent(renderer);
