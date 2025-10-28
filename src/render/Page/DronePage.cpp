@@ -164,7 +164,7 @@ void handleAddDrone(SDL_Renderer *renderer, int mx, int my, vector<Drone> &drone
                 break;
             }
         }
-        Drone newDrone(newID, name, x, y, 100.0f, 200, "idle", startNodeID);
+        Drone newDrone(newID, name, x, y, 100.0f, 100, "idle", startNodeID);
 
         drones.push_back(newDrone);
         writeDronesToFile("D:/Drone-project/src/data/Drone.txt", drones);

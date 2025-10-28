@@ -244,7 +244,7 @@ int main(int argc, char *argv[])
 
                 if (hasPendingOrder)
                 {
-                    logMessage("[SYSTEM] Co don hang moi, khoi dong lai drone\n");
+                    logMessage("[SYSTEM] Co don hang moi, khoi dong lai drone");
                     cout << "[DEBUG] assignOrdersGreedy trong newOrder duoc goi!" << endl;
                     assignOrdersGreedy(drones, orders, nodes, edges);
                     isMoving = true;
@@ -341,6 +341,7 @@ int main(int argc, char *argv[])
         }
 
         SDL_RenderPresent(renderer);
+        SDL_Delay(16); // Lúc này mỗi giây chỉ ~60 vòng → deltaTime ≈ 0.016s đúng thực tế
     }
 
     TTF_CloseFont(font);
