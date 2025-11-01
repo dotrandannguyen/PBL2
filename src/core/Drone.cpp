@@ -100,12 +100,12 @@ bool Drone::updateMove(float deltaTime)
     X += step * (dx / dist);
     Y += step * (dy / dist);
 
-    // Tính phần trăm pin hao mọt 150000.0fpx -> 1% pin và  phần trăm s
+    // Tính phần trăm pin hao mọt 200000.0fpx
     float moveDist = sqrt((X - oldX) * (X - oldX) + (Y - oldY) * (Y - oldY));
 
-    float pinRateDist = 1.0f / 150000.0f;
-    float pinRateTime = 0.00002f;
-    Battery -= moveDist * pinRateDist + pinRateTime * deltaTime;
+    float pinRateDist = 1.0f / 200000.0f;
+    // float pinRateTime = 0.00002f;
+    Battery -= moveDist * pinRateDist;
 
     if (Battery < 0)
         Battery = 0;
