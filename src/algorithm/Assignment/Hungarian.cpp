@@ -45,9 +45,38 @@ vector<int> hungarian(const vector<vector<float>> &costMatrix)
                 if (minv[j] < delta)
                 {
                     delta = minv[j];
+                    j1 = j;
                 }
             }
+            for (int j = 0; j <= size; j++)
+            {
+                if (used[j])
+                {
+                    u[p[j]] += delta;
+                    v[j] -= delta;
+                }
+                else
+                    minv[j] -= delta;
+            }
+
+            j0 = j1;
+
         } while (p[j0] != 0);
+        do
+        {
+            int j1 = way[j0];
+            p[j0] = p[j1];
+            j0 = j1;
+        } while (j0);
+
+        vector<int> assignment(n, -1);
+        for (int j = 1; j <= size; j++)
+        {
+            if (p[j] <= n && j <= m)
+                assignment[p[j] - 1] = j - 1;
+        }
+
+        return assignment;
     }
 }
 
