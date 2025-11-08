@@ -17,6 +17,11 @@ SDL_Point getDronePosXY(const string &pos)
     return {baseX + 100, baseY + 100};
 }
 
+void addNoFlyZone(float x, float y, float r)
+{
+    noFlyZones.push_back({x, y, r});
+}
+
 void renderHomePage(SDL_Renderer *renderer, TTF_Font *fontSmall, const vector<Drone> &drones, const vector<Node> &nodes, const vector<Edge> &edges, const vector<Order> &orders)
 {
     SDL_Color textColor = {0, 0, 0, 255};
@@ -33,28 +38,31 @@ void renderHomePage(SDL_Renderer *renderer, TTF_Font *fontSmall, const vector<Dr
                    static_cast<int>(n.getY()) - 18,
                    textColor);
     }
-    // vẽ các cạnh giữa các node
-    for (auto &e : edges)
+    // vẽ các cạnh giữa các node neu show
+    if (isShowEdge)
     {
-        const Node *startNode = nullptr;
-        const Node *endNode = nullptr;
-
-        for (auto &n : nodes)
+        for (auto &e : edges)
         {
-            if (n.getNodeID() == e.getStartNode())
-                startNode = &n;
-            if (n.getNodeID() == e.getEndNode())
-                endNode = &n;
-        }
+            const Node *startNode = nullptr;
+            const Node *endNode = nullptr;
 
-        if (startNode && endNode)
-        {
-            SDL_SetRenderDrawColor(renderer, 100, 100, 100, 255);
-            SDL_RenderDrawLine(renderer,
-                               static_cast<int>(startNode->getX()) + 10,
-                               static_cast<int>(startNode->getY()) + 10,
-                               static_cast<int>(endNode->getX()) + 10,
-                               static_cast<int>(endNode->getY()) + 10);
+            for (auto &n : nodes)
+            {
+                if (n.getNodeID() == e.getStartNode())
+                    startNode = &n;
+                if (n.getNodeID() == e.getEndNode())
+                    endNode = &n;
+            }
+
+            if (startNode && endNode)
+            {
+                SDL_SetRenderDrawColor(renderer, 100, 100, 100, 255);
+                SDL_RenderDrawLine(renderer,
+                                   static_cast<int>(startNode->getX()) + 10,
+                                   static_cast<int>(startNode->getY()) + 10,
+                                   static_cast<int>(endNode->getX()) + 10,
+                                   static_cast<int>(endNode->getY()) + 10);
+            }
         }
     }
 
@@ -132,11 +140,13 @@ void renderHomePage(SDL_Renderer *renderer, TTF_Font *fontSmall, const vector<Dr
     SDL_Rect addBtn = {w - btnW - 20, h - btnH - 20, btnW, btnH}; // cách viền 20 px
     SDL_SetRenderDrawColor(renderer, 0, 150, 255, 255);
     SDL_RenderFillRect(renderer, &addBtn);
-    renderText(renderer, fontSmall, "Add Drone", addBtn.x + 10, addBtn.y + 10, {255, 255, 255, 255});
+    string btnLabel = "Add Drone (" + to_string(drones.size()) + ")";
+    renderText(renderer, fontSmall, btnLabel, addBtn.x + 10, addBtn.y + 10, {255, 255, 255, 255});
 
     SDL_Rect addNodeBtn = {w - 2 * btnW - 40, h - btnH - 20, btnW, btnH};
     SDL_SetRenderDrawColor(renderer, 255, 100, 0, 255);
     SDL_RenderFillRect(renderer, &addNodeBtn);
+
     renderText(renderer, fontSmall, "Add Node", addNodeBtn.x + 10, addNodeBtn.y + 10, {255, 255, 255, 255});
 
     // Vẽ nút Info (toggle panel)
@@ -144,6 +154,22 @@ void renderHomePage(SDL_Renderer *renderer, TTF_Font *fontSmall, const vector<Dr
     SDL_SetRenderDrawColor(renderer, 50, 150, 255, 255);
     SDL_RenderFillRect(renderer, &infoBtn);
     renderText(renderer, fontSmall, "Info", infoBtn.x + 10, infoBtn.y + 5, {255, 255, 255, 255});
+
+    // nút vẽ đường cấm bay
+    SDL_Rect noFlyBtn = {w - 200, 20, 100, 30};
+    SDL_SetRenderDrawColor(renderer, 50, 150, 255, 255);
+    SDL_RenderFillRect(renderer, &noFlyBtn);
+    renderText(renderer, fontSmall, "No-Fly Zone", noFlyBtn.x + 10, noFlyBtn.y + 5, {255, 255, 255, 255});
+
+    // nút show or off edge
+    SDL_Rect edgeShowBtn = {w - 320, 20, 100, 30};
+    // Đổi màu theo trạng thái
+    if (isShowEdge)
+        SDL_SetRenderDrawColor(renderer, 0, 200, 0, 255); // Xanh khi ON
+    else
+        SDL_SetRenderDrawColor(renderer, 255, 0, 0, 255); // Đỏ khi OFF
+    SDL_RenderFillRect(renderer, &edgeShowBtn);
+    renderText(renderer, fontSmall, isShowEdge ? "Edges show: on" : "Edges show: off", edgeShowBtn.x + 10, edgeShowBtn.y + 5, {255, 255, 255, 255});
 
     if (showInfoPanel)
     {
@@ -187,6 +213,24 @@ void renderHomePage(SDL_Renderer *renderer, TTF_Font *fontSmall, const vector<Dr
 
         if (!hasActive)
             renderText(renderer, fontSmall, "No active deliveries", infoBox.x + 10, y, {100, 100, 100, 255});
+    }
+
+    // ve vung cam
+    for (auto &zone : noFlyZones)
+    {
+        SDL_SetRenderDrawBlendMode(renderer, SDL_BLENDMODE_BLEND); // chế độ trong suốt
+        // Vẽ hình tròn đỏ
+        SDL_SetRenderDrawColor(renderer, 255, 0, 0, 120);
+        for (int w = 0; w < zone.r * 2; w++)
+        {
+            for (int h = 0; h < zone.r * 2; h++)
+            {
+                int dx = zone.r - w;
+                int dy = zone.r - h;
+                if (dx * dx + dy * dy <= zone.r * zone.r)
+                    SDL_RenderDrawPoint(renderer, zone.x + dx, zone.y + dy);
+            }
+        }
     }
 }
 
@@ -257,6 +301,37 @@ void hanldeHomePageInfoClick(SDL_Renderer *renderer, int mx, int my)
     if (isMouseInside(infoBtn, mx, my))
     {
         showInfoPanel = !showInfoPanel; // Đảo trạng thái hiển thị
+    }
+}
+
+void handleHomePageShowEdgeClick(SDL_Renderer *renderer, int mx, int my)
+{
+    int w, h;
+    SDL_GetRendererOutputSize(renderer, &w, &h);
+    SDL_Rect edgeShowBtn = {w - 320, 20, 100, 30};
+    if (isMouseInside(edgeShowBtn, mx, my))
+    {
+        isShowEdge = !isShowEdge;
+    }
+}
+
+void handleAddNoFlyArea(int mx, int my)
+{
+    float radius = 50.0f;
+    addNoFlyZone(mx, my, radius);
+    isNoFly = false;
+}
+
+void handleHomePageNoFlyClick(SDL_Renderer *renderer, int mx, int my)
+{
+    int w, h;
+    SDL_GetRendererOutputSize(renderer, &w, &h);
+
+    SDL_Rect noFlyBtn = {w - 200, 20, 100, 30};
+    if (isMouseInside(noFlyBtn, mx, my))
+    {
+
+        isNoFly = true;
     }
 }
 

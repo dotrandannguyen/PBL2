@@ -2,16 +2,70 @@
 
 using namespace std;
 
-AdjList buildAdjacencyList(const vector<Edge> &edges)
+bool lineIntersectsCircle(float x1, float y1, float x2, float y2, float cx, float cy, float r)
+{
+    float dx = x2 - x1;
+    float dy = y2 - y1;
+
+    float fx = x1 - cx;
+    float fy = y1 - cy;
+
+    float a = dx * dx + dy * dy;
+    float b = 2 * (fx * dx + fy * dy);
+    float c = fx * fx + fy * fy - r * r;
+
+    float discriminant = b * b - 4 * a * c;
+    if (discriminant < 0)
+        return false; // không cắt
+
+    discriminant = sqrt(discriminant);
+    float t1 = (-b - discriminant) / (2 * a);
+    float t2 = (-b + discriminant) / (2 * a);
+
+    // kiểm tra điểm giao có nằm trên đoạn AB không
+    return (t1 >= 0 && t1 <= 1) || (t2 >= 0 && t2 <= 1);
+}
+
+AdjList buildAdjacencyList(const vector<Edge> &edges, const vector<NoFlyZone> &zones, const unordered_map<string, Node> &nodesMap)
 {
     AdjList adj;
 
     for (const auto &e : edges)
     {
-        adj[e.getStartNode()].push_back({e.getEndNode(), e.getDistance()});
-        adj[e.getEndNode()].push_back({e.getStartNode(), e.getDistance()}); // nếu vô hướng
-    }
+        // --- kiểm tra Node tồn tại ---
+        auto itA = nodesMap.find(e.getStartNode());
+        auto itB = nodesMap.find(e.getEndNode());
 
+        if (itA == nodesMap.end() || itB == nodesMap.end())
+        {
+            cerr << "Canh bao: NodeID "
+                 << (itA == nodesMap.end() ? e.getStartNode() : e.getEndNode())
+                 << " ko ton tai, bo canh "
+                 << e.getStartNode() << " -> " << e.getEndNode() << "\n";
+            continue; // bỏ cạnh, tránh out_of_range
+        }
+
+        Node a = itA->second;
+        Node b = itB->second;
+
+        // --- kiểm tra no-fly zone ---
+        bool blocked = false;
+        for (const auto &z : zones)
+        {
+            if (lineIntersectsCircle(a.getX(), a.getY(), b.getX(), b.getY(),
+                                     z.x, z.y, z.r))
+            {
+                blocked = true;
+                break;
+            }
+        }
+
+        if (!blocked)
+        {
+            adj[e.getStartNode()].push_back({e.getEndNode(), e.getDistance()});
+            adj[e.getEndNode()].push_back({e.getStartNode(), e.getDistance()});
+        }
+    }
     // ex
     // adj = {
     //     {"N01", {{"N02", 10.0}, {"N03", 5.0}}},
@@ -30,7 +84,17 @@ vector<string> dijkstra(const string &start, const string &end)
         return {};
     }
 
-    AdjList adj = buildAdjacencyList(edges);
+    unordered_map<string, Node> nodesMap;
+    vector<Node> nodes = readNodesFromFile("D:/Drone-project/src/data/Node.txt");
+    if (nodes.empty())
+    {
+        cerr << "Không thể đọc dữ liệu node từ file.\n";
+        return {};
+    }
+    for (const auto &n : nodes)
+        nodesMap[n.getNodeID()] = n;
+
+    AdjList adj = buildAdjacencyList(edges, noFlyZones, nodesMap);
 
     unordered_map<string, float> dist;                                                                 // dist[nodeid] = khoang cach tu start -> nodeid
     unordered_map<string, string> prev;                                                                // lu duong di ngan nhat theo dang N1 -> N2

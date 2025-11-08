@@ -34,7 +34,12 @@ vector<string> astar(const string &start, const string &end)
         return {};
     }
 
-    AdjList adj = buildAdjacencyList(edges);
+    unordered_map<string, Node> nodesMap;
+
+    for (const auto &n : nodes)
+        nodesMap[n.getNodeID()] = n;
+
+    AdjList adj = buildAdjacencyList(edges, noFlyZones, nodesMap);
 
     const float INF = 1e9;
 

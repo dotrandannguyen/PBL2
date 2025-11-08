@@ -21,6 +21,8 @@ bool isAddingDrone = false;
 bool isAddingNode = false;
 bool isAddingOrder = false;
 bool showInfoPanel = false;
+bool isShowEdge = false;
+bool isNoFly = false;
 
 vector<Drone> drones = readDronesFromFile("D:/Drone-project/src/data/Drone.txt");
 vector<Node> nodes = readNodesFromFile("D:/Drone-project/src/data/Node.txt");
@@ -38,6 +40,7 @@ struct Button
 vector<DroneButton> droneButtons;
 vector<OrderButton> orderButtons;
 vector<string> notifications;
+vector<NoFlyZone> noFlyZones;
 
 int main(int argc, char *argv[])
 {
@@ -141,6 +144,7 @@ int main(int argc, char *argv[])
                 if (currentPage == "Home")
                 {
                     hanldeHomePageInfoClick(renderer, mx, my);
+                    handleHomePageShowEdgeClick(renderer, mx, my);
                     handleHomePageDroneClick(renderer, mx, my, drones, nodes);
 
                     if (isAddingNode)
@@ -150,6 +154,15 @@ int main(int argc, char *argv[])
                     else
                     {
                         handleHomePageNodeClick(renderer, mx, my);
+                    }
+
+                    if (isNoFly)
+                    {
+                        handleAddNoFlyArea(mx, my);
+                    }
+                    else
+                    {
+                        handleHomePageNoFlyClick(renderer, mx, my);
                     }
                 }
                 else if (currentPage == "Order")
