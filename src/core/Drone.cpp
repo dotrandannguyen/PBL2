@@ -93,23 +93,21 @@ bool Drone::updateMove(float deltaTime)
     }
 
     // Tính bước di chuyển (Speed pixel/s)
+    // Tính bước di chuyển
     float step = Speed * deltaTime;
+    if (dist > 0.001f) // tránh chia cho 0
+    {
+        float moveStep = min(step, dist); // không vượt quá mục tiêu
+        X += moveStep * (dx / dist);
+        Y += moveStep * (dy / dist);
 
-    float oldX = X;
-    float oldY = Y;
-    X += step * (dx / dist);
-    Y += step * (dy / dist);
-
-    // Tính phần trăm pin hao mọt 200000.0fpx
-    float moveDist = sqrt((X - oldX) * (X - oldX) + (Y - oldY) * (Y - oldY));
-
-    float pinRateDist = 1.0f / 200000.0f;
-    // float pinRateTime = 0.00002f;
-    Battery -= moveDist * pinRateDist;
-
-    if (Battery < 0)
-        Battery = 0;
-
+        // Tính hao pin theo quãng đường đi
+        float moveDist = moveStep;
+        float pinRateDist = 1.0f / 200000.0f;
+        Battery -= moveDist * pinRateDist;
+        if (Battery < 0)
+            Battery = 0;
+    }
     // // --- Log sau khi cập nhật vị trí ---
     // cout << "[AFTER MOVE] " << DroneID
     //      << " newPos=(" << X << "," << Y << ")" << endl;

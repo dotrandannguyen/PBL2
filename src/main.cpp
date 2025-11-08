@@ -1,5 +1,6 @@
 #include <SDL2/SDL.h>
 #include <SDL2/SDL_ttf.h>
+#include <SDL2/SDL_image.h>
 #include <iostream>
 #include <string>
 #include <vector>
@@ -57,6 +58,12 @@ int main(int argc, char *argv[])
         return 1;
     }
 
+    if (IMG_Init(IMG_INIT_PNG) == 0)
+    {
+        cout << "IMG could not initialize! " << IMG_GetError() << "\n";
+        return 1;
+    }
+
     SDL_DisplayMode DM;
     SDL_GetCurrentDisplayMode(0, &DM);
     int screenWidth = DM.w;
@@ -75,8 +82,18 @@ int main(int argc, char *argv[])
     SDL_Color textColor = {255, 255, 255, 255};
     SDL_Color selectedColor = {255, 174, 66, 255};
 
+    // font
     TTF_Font *font = TTF_OpenFont("C:/Windows/Fonts/segoeui.ttf", 22);
     TTF_Font *fontSmall = TTF_OpenFont("C:/Windows/Fonts/segoeui.ttf", 12);
+
+    // texture
+    SDL_Texture *homeIcon = loadTexture(renderer, "D:/Drone-project/src/assets/home.png");
+    SDL_Texture *droneIcon = loadTexture(renderer, "D:/Drone-project/src/assets/drone.png");
+    SDL_Texture *orderIcon = loadTexture(renderer, "D:/Drone-project/src/assets/order.png");
+    SDL_Texture *taskIcon = loadTexture(renderer, "D:/Drone-project/src/assets/task.png");
+    SDL_Texture *notificationIcon = loadTexture(renderer, "D:/Drone-project/src/assets/notification.png");
+    SDL_Texture *graphIcon = loadTexture(renderer, "D:/Drone-project/src/assets/graph.png");
+
     if (!font)
     {
         cout << "Không tìm thấy font!\n";
@@ -287,7 +304,34 @@ int main(int argc, char *argv[])
                     SDL_SetRenderDrawColor(renderer, sidebarColor.r, sidebarColor.g, sidebarColor.b, 255);
 
                 SDL_RenderFillRect(renderer, &btnRect);
-                renderText(renderer, font, btn.label, btnRect.x + 20, btnRect.y + 10, textColor);
+                SDL_Texture *icon = nullptr;
+                if (btn.label == "Home")
+                    icon = homeIcon;
+                else if (btn.label == "Drone")
+                    icon = droneIcon;
+                else if (btn.label == "Order")
+                    icon = orderIcon;
+                else if (btn.label == "Task")
+                    icon = taskIcon;
+                else if (btn.label == "Notification")
+                    icon = notificationIcon;
+                else if (btn.label == "Graph")
+                    icon = graphIcon;
+
+                if (icon)
+                {
+                    int iconSize = static_cast<int>(btnRect.h * 0.4);   // icon vừa với chiều cao button
+                    int iconX = btnRect.x + 10;                         // cách viền trái 10px
+                    int iconY = btnRect.y + (btnRect.h - iconSize) / 2; // căn giữa theo chiều cao
+
+                    renderTexture(renderer, icon, iconX, iconY, iconSize, iconSize);
+                }
+                int fontHeight = TTF_FontHeight(font);
+
+                // Vẽ label căn giữa theo chiều cao button
+                int textX = btnRect.x + (btn.rect.h * 0.8) + 5; // cách icon 20px
+                int textY = btnRect.y + (btnRect.h - fontHeight) / 2;
+                renderText(renderer, font, btn.label, textX, textY, textColor);
             }
         }
 
@@ -359,7 +403,14 @@ int main(int argc, char *argv[])
 
     TTF_CloseFont(font);
     TTF_Quit();
+    IMG_Quit();
     SDL_DestroyRenderer(renderer);
+    SDL_DestroyTexture(homeIcon);
+    SDL_DestroyTexture(droneIcon);
+    SDL_DestroyTexture(orderIcon);
+    SDL_DestroyTexture(taskIcon);
+    SDL_DestroyTexture(notificationIcon);
+    SDL_DestroyTexture(graphIcon);
     SDL_DestroyWindow(window);
     SDL_Quit();
     return 0;
