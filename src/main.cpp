@@ -191,6 +191,21 @@ int main(int argc, char *argv[])
                         hasNewOrder = true; // cho phep drone chay lai khi co don moi duoc them vao
                     }
 
+                    SDL_Point mousePoint = {mx, my};
+                    if (SDL_PointInRect(&mousePoint, &pageOrderButtons.prevBtn))
+                    {
+                        if (currentOrderPage > 0)
+                            currentOrderPage--;
+                    }
+                    else if (SDL_PointInRect(&mousePoint, &pageOrderButtons.nextBtn))
+                    {
+                        int totalPage = (orders.size() + ORDERS_PER_PAGE - 1) / ORDERS_PER_PAGE;
+                        if (currentOrderPage < totalPage - 1)
+                        {
+                            currentOrderPage++;
+                        }
+                    }
+
                     for (auto &ob : orderButtons)
                     {
                         if (isMouseInside(ob.editBtn, mx, my))

@@ -19,8 +19,18 @@ struct OrderButton
     SDL_Rect delBtn;
     string OrderID;
 };
-
 extern vector<OrderButton> orderButtons;
+
+struct PageOrderButton
+{
+    SDL_Rect prevBtn;
+    SDL_Rect nextBtn;
+};
+
+extern PageOrderButton pageOrderButtons;
+
+extern int currentOrderPage;
+const int ORDERS_PER_PAGE = 15;
 
 void renderOrderPage(SDL_Renderer *renderer, TTF_Font *font, const vector<Order> &orders, int startX);
 

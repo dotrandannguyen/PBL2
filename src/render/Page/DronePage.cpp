@@ -108,6 +108,10 @@ void renderDronePage(SDL_Renderer *renderer, TTF_Font *font, const vector<Drone>
             x += colWidths[j];
         }
 
+        if (drones.size() != 0)
+        {
+        }
+
         int btnW = 70;
         int btnH = 30;
         int btnGap = 20;
@@ -143,61 +147,60 @@ void renderDronePage(SDL_Renderer *renderer, TTF_Font *font, const vector<Drone>
         y += rowHeight;
     }
 
-    int btnW = 100, btnH = 35;
-    int spacing = 20; // khoảng cách giữa Prev, PageBox, Next
+    if (drones.size() != 0)
+    {
+        int btnW = 100, btnH = 35;
+        int spacing = 20; // khoảng cách giữa Prev, PageBox, Next
 
-    // Tính vị trí trung tâm cụm 3 nút
-    int groupWidth = btnW * 2 + spacing * 2 + 150; // ước lượng thêm chỗ cho khung trang
-    int centerX = winW - groupWidth / 2 - 250;     // căn giữa gần mép phải (tùy chỉnh nếu cần)
-    int baseY = y + 20;
+        // Tính vị trí trung tâm cụm 3 nút
+        int groupWidth = btnW * 2 + spacing * 2 + 150; // ước lượng thêm chỗ cho khung trang
+        int centerX = winW - groupWidth / 2 - 250;     // căn giữa gần mép phải (tùy chỉnh nếu cần)
+        int baseY = y + 20;
 
-    // Prev
-    SDL_Rect prevBtn = {centerX, baseY, btnW, btnH};
+        // Prev
+        SDL_Rect prevBtn = {centerX, baseY, btnW, btnH};
 
-    // --- Page Box ---
-    string pageText = "Page " + to_string(currentDronePage + 1) + " / " + to_string(totalPages);
+        // Page Box
+        string pageText = "Page " + to_string(currentDronePage + 1) + " / " + to_string(totalPages);
 
-    TTF_SizeText(font, pageText.c_str(), &textW, &textH);
+        TTF_SizeText(font, pageText.c_str(), &textW, &textH);
 
-    int boxW = textW + 50;
-    int boxH = btnH;
-    SDL_Rect pageBox = {prevBtn.x + btnW + spacing, baseY, boxW, boxH};
+        int boxW = textW + 50;
+        int boxH = btnH;
+        SDL_Rect pageBox = {prevBtn.x + btnW + spacing, baseY, boxW, boxH};
 
-    // --- Next ---
-    SDL_Rect nextBtn = {pageBox.x + boxW + spacing, baseY, btnW, btnH};
+        SDL_SetRenderDrawColor(renderer, 173, 216, 230, 255); // xanh nhạt
+        SDL_RenderFillRect(renderer, &pageBox);
+        SDL_SetRenderDrawColor(renderer, 70, 130, 180, 255); // viền xanh đậm
+        SDL_RenderDrawRect(renderer, &pageBox);
 
-    // --- Vẽ nút ---
-    SDL_SetRenderDrawColor(renderer, 100, 149, 237, 255);
-    SDL_RenderFillRect(renderer, &prevBtn);
-    SDL_RenderFillRect(renderer, &nextBtn);
+        int textX = pageBox.x + (pageBox.w - textW) / 2;
+        int textY = pageBox.y + (pageBox.h - textH) / 2;
 
-    // --- Text Prev/Next ---
-    TTF_SizeText(font, "Prev", &textW, &textH);
-    renderText(renderer, font, "Prev",
-               prevBtn.x + (btnW - textW) / 2,
-               prevBtn.y + (btnH - textH) / 2,
-               {255, 255, 255, 255});
+        renderText(renderer, font, pageText, textX, textY, {0, 0, 0, 255});
+        // Next
+        SDL_Rect nextBtn = {pageBox.x + boxW + spacing, baseY, btnW, btnH};
 
-    TTF_SizeText(font, "Next", &textW, &textH);
-    renderText(renderer, font, "Next",
-               nextBtn.x + (btnW - textW) / 2,
-               nextBtn.y + (btnH - textH) / 2,
-               {255, 255, 255, 255});
+        //  Vẽ nút
+        SDL_SetRenderDrawColor(renderer, 100, 149, 237, 255);
+        SDL_RenderFillRect(renderer, &prevBtn);
+        SDL_RenderFillRect(renderer, &nextBtn);
 
-    // --- Khung trang ---
-    SDL_SetRenderDrawColor(renderer, 173, 216, 230, 255);
-    SDL_RenderFillRect(renderer, &pageBox);
-    SDL_SetRenderDrawColor(renderer, 70, 130, 180, 255);
-    SDL_RenderDrawRect(renderer, &pageBox);
+        //  Text Prev/Next
+        TTF_SizeText(font, "Prev", &textW, &textH);
+        renderText(renderer, font, "Prev",
+                   prevBtn.x + (btnW - textW) / 2,
+                   prevBtn.y + (btnH - textH) / 2,
+                   {255, 255, 255, 255});
 
-    // --- Text trang ---
-    renderText(renderer, font, pageText,
-               pageBox.x + (boxW - textW) / 2,
-               pageBox.y + (boxH - textH) / 2,
-               {0, 0, 0, 255});
-
-    // --- Lưu vị trí ---
-    pageButtons = {prevBtn, nextBtn};
+        TTF_SizeText(font, "Next", &textW, &textH);
+        renderText(renderer, font, "Next",
+                   nextBtn.x + (btnW - textW) / 2,
+                   nextBtn.y + (btnH - textH) / 2,
+                   {255, 255, 255, 255});
+        // Lưu vị trí
+        pageButtons = {prevBtn, nextBtn};
+    }
 }
 
 void handleAddDrone(SDL_Renderer *renderer, int mx, int my, vector<Drone> &drones, const vector<Node> &nodes)

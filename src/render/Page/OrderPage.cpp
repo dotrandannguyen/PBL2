@@ -2,6 +2,9 @@
 
 using namespace std;
 
+PageOrderButton pageOrderButtons;
+int currentOrderPage = 0;
+
 void renderOrderPage(SDL_Renderer *renderer, TTF_Font *font, const vector<Order> &orders, int startX)
 {
     SDL_Color textColor = {0, 0, 0, 255};
@@ -67,9 +70,15 @@ void renderOrderPage(SDL_Renderer *renderer, TTF_Font *font, const vector<Order>
 
     // ve lai order button
     orderButtons.clear();
+    int totalOrders = orders.size();
+    int totalPages = (totalOrders + ORDERS_PER_PAGE - 1) / ORDERS_PER_PAGE;
 
-    for (auto &o : orders)
+    int startIndex = currentOrderPage * ORDERS_PER_PAGE;
+    int endIndex = min(startIndex + ORDERS_PER_PAGE, totalOrders);
+
+    for (int i = startIndex; i < endIndex; i++)
     {
+        const Order &o = orders[i];
         x = startX;
 
         vector<string> row = {
@@ -137,6 +146,55 @@ void renderOrderPage(SDL_Renderer *renderer, TTF_Font *font, const vector<Order>
 
         y += rowHeight;
     }
+
+    int btnW = 100, btnH = 35;
+    int spacing = 20;
+
+    int groupWidth = btnW * 2 + spacing * 2 + 150;
+    int centerX = winW - groupWidth / 2 - 250;
+    int baseY = y + 20;
+
+    // Prev
+    SDL_Rect prevBtn = {centerX, baseY, btnW, btnH};
+
+    // Page Box
+    string pageText = "Page " + to_string(currentOrderPage + 1) + " / " + to_string(totalPages);
+    TTF_SizeText(font, pageText.c_str(), &textW, &textH);
+
+    int boxW = textW + 40;
+    int boxH = btnH;
+    SDL_Rect pageBox = {prevBtn.x + btnW + spacing, baseY, boxW, boxH};
+    SDL_SetRenderDrawColor(renderer, 173, 216, 230, 255);
+    SDL_RenderFillRect(renderer, &pageBox);
+    SDL_SetRenderDrawColor(renderer, 70, 130, 180, 255);
+    SDL_RenderDrawRect(renderer, &pageBox);
+
+    // text Page
+    renderText(renderer, font, pageText,
+               pageBox.x + (pageBox.w - textW) / 2,
+               pageBox.y + (pageBox.h - textH) / 2,
+               {0, 0, 0, 255});
+    // Next
+    SDL_Rect nextBtn = {pageBox.x + boxW + spacing, baseY, btnW, btnH};
+
+    // ve nut
+    SDL_SetRenderDrawColor(renderer, 100, 149, 237, 255);
+    SDL_RenderFillRect(renderer, &prevBtn);
+    SDL_RenderFillRect(renderer, &nextBtn);
+
+    // Text Prev/Next
+    TTF_SizeText(font, "Prev", &textW, &textH);
+    renderText(renderer, font, "Prev", prevBtn.x + (btnW - textW) / 2,
+               prevBtn.y + (btnH - textH) / 2,
+               {255, 255, 255, 255});
+
+    TTF_SizeText(font, "Next", &textW, &textH);
+    renderText(renderer, font, "Next",
+               nextBtn.x + (btnW - textW) / 2,
+               nextBtn.y + (btnH - textH) / 2,
+               {255, 255, 255, 255});
+
+    pageOrderButtons = {prevBtn, nextBtn};
 }
 
 void handleAddOrder(vector<Order> &orders)
