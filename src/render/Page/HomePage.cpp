@@ -2,6 +2,9 @@
 
 // Biến toàn cục để lưu drone nào đang được chọn
 int selectedDroneIndex = -1;
+bool showInfoPanel = false;
+bool isShowEdge = false;
+bool isNoFly = false;
 
 SDL_Point getDronePosXY(const string &pos)
 {

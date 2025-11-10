@@ -21,9 +21,6 @@ using namespace std;
 bool isAddingDrone = false;
 bool isAddingNode = false;
 bool isAddingOrder = false;
-bool showInfoPanel = false;
-bool isShowEdge = false;
-bool isNoFly = false;
 
 vector<Drone> drones = readDronesFromFile("D:/Drone-project/src/data/Drone.txt");
 vector<Node> nodes = readNodesFromFile("D:/Drone-project/src/data/Node.txt");
@@ -211,8 +208,21 @@ int main(int argc, char *argv[])
                 else if (currentPage == "Drone")
                 {
                     handleAddDrone(renderer, mx, my, drones, nodes);
+                    SDL_Point mousePoint = {mx, my};
+                    if (SDL_PointInRect(&mousePoint, &pageButtons.prevBtn))
+                    {
+                        if (currentDronePage > 0)
+                            currentDronePage--;
+                    }
+                    else if (SDL_PointInRect(&mousePoint, &pageButtons.nextBtn))
+                    {
+                        int totalPages = (drones.size() + DRONES_PER_PAGE - 1) / DRONES_PER_PAGE;
+                        if (currentDronePage < totalPages - 1)
+                            currentDronePage++;
+                    }
                     for (auto &db : droneButtons)
                     {
+
                         if (isMouseInside(db.editBtn, mx, my))
                         {
                             handleEditDrone(db.droneID, drones);

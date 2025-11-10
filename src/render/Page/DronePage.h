@@ -17,9 +17,19 @@ struct DroneButton
     SDL_Rect delBtn;
     string droneID;
 };
+extern vector<DroneButton> droneButtons;
+
+struct PageButtons
+{
+    SDL_Rect prevBtn;
+    SDL_Rect nextBtn;
+};
+extern PageButtons pageButtons;
+extern int currentDronePage;
+
+const int DRONES_PER_PAGE = 15;
 
 // nut delete edit
-extern vector<DroneButton> droneButtons;
 
 void renderDronePage(SDL_Renderer *renderer, TTF_Font *font, const std::vector<Drone> &drones, int startX);
 
