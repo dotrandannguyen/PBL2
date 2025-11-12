@@ -1,7 +1,7 @@
 #ifndef HOMEPAGE_H
 #define HOMEPAGE_H
+#define SDL_MAIN_HANDLED
 
-#include <SDL2/SDL.h>
 #include <SDL2/SDL_ttf.h>
 #include <vector>
 #include <string>

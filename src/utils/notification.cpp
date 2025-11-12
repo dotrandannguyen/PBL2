@@ -1,5 +1,5 @@
 #include "notification.h"
-
+vector<string> notifications;
 void logMessage(const string &msg)
 {
 

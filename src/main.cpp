@@ -1,3 +1,4 @@
+#define SDL_MAIN_HANDLED
 #include <SDL2/SDL.h>
 #include <SDL2/SDL_ttf.h>
 #include <SDL2/SDL_image.h>
@@ -13,6 +14,7 @@
 #include "render/Page/HomePage.h"
 #include "render/Page/DronePage.h"
 #include "render/Page/NotificationPage.h"
+#include "render/Page/StatisticsPage.h"
 #include "algorithm/PathFinder/Dijkstra.h"
 #include "algorithm/Assignment/Greedy.h"
 #include "utils/notification.h"
@@ -37,12 +39,12 @@ struct Button
 
 vector<DroneButton> droneButtons;
 vector<OrderButton> orderButtons;
-vector<string> notifications;
+
 vector<NoFlyZone> noFlyZones;
 
 int main(int argc, char *argv[])
 {
-
+    SDL_SetMainReady();
     if (SDL_Init(SDL_INIT_VIDEO) < 0)
     {
         cout << "SDL could not initialize! " << SDL_GetError() << "\n";
@@ -420,6 +422,10 @@ int main(int argc, char *argv[])
         else if (currentPage == "Notification")
         {
             renderNotificationPage(renderer, font, notifications);
+        }
+        else if (currentPage == "Graph")
+        {
+            renderStatisticsPage(renderer, font, contentX);
         }
 
         SDL_RenderPresent(renderer);
