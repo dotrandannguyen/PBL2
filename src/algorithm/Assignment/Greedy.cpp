@@ -159,6 +159,7 @@ vector<Node> convertPathToNodes(const vector<string> &pathIDs, const vector<Node
 void assignOrdersGreedy(vector<Drone> &drones, vector<Order> &orders, const vector<Node> &nodes, const vector<Edge> &edges)
 {
     // với mỗi drone rảnh, tìm order pending gần nhất
+    auto startTime = chrono::high_resolution_clock::now();
     for (int i = 0; i < (int)drones.size(); ++i)
     {
         Drone &d = drones[i];
@@ -192,6 +193,12 @@ void assignOrdersGreedy(vector<Drone> &drones, vector<Order> &orders, const vect
 
         if (bestOrderIndex != -1)
         {
+            auto endTime = chrono::high_resolution_clock::now();
+            float duration = chrono::duration<float, milli>(endTime - startTime).count();
+            greedyTimes.push_back(duration);
+            cout << "Drone " << i << " assign time: " << duration << " ms\n";
+            cout << "size" << greedyTimes.size() << endl;
+
             Order &o = orders[bestOrderIndex];
             // path pickup -> dropoff
             vector<string> pickupToDrop = astar(o.getPickupLocation(), o.getDropoffLocation());

@@ -425,7 +425,7 @@ int main(int argc, char *argv[])
         }
         else if (currentPage == "Graph")
         {
-            renderStatisticsPage(renderer, font, contentX);
+            renderStatisticsPage(renderer, fontSmall, contentX);
         }
 
         SDL_RenderPresent(renderer);

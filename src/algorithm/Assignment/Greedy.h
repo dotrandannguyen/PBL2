@@ -4,11 +4,14 @@
 #include <iostream>
 #include <vector>
 #include <string>
+#include <chrono>
+#include <cmath>
 
 #include "../../core/Drone.h"
 #include "../../core/Order.h"
 #include "../PathFinder/Dijkstra.h"
 #include "../PathFinder/AStar.h"
+#include "../../render/Page/StatisticsPage.h"
 
 using namespace std;
 

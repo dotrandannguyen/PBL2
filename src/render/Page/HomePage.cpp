@@ -29,19 +29,7 @@ void renderHomePage(SDL_Renderer *renderer, TTF_Font *fontSmall, const vector<Dr
 {
     SDL_Color textColor = {0, 0, 0, 255};
 
-    // vẽ từng node
-    for (auto &n : nodes)
-    {
-        SDL_Rect nodeRect = {static_cast<int>(n.getX()), static_cast<int>(n.getY()), 14, 14};
-        SDL_SetRenderDrawColor(renderer, 200, 0, 0, 255); // Node màu đỏ
-        SDL_RenderFillRect(renderer, &nodeRect);
-
-        renderText(renderer, fontSmall, n.getNodeID(),
-                   static_cast<int>(n.getX()) - 5,
-                   static_cast<int>(n.getY()) - 18,
-                   textColor);
-    }
-    // vẽ các cạnh giữa các node neu show
+        // vẽ các cạnh giữa các node neu show
     if (isShowEdge)
     {
         for (auto &e : edges)
@@ -67,6 +55,19 @@ void renderHomePage(SDL_Renderer *renderer, TTF_Font *fontSmall, const vector<Dr
                                    static_cast<int>(endNode->getY()) + 10);
             }
         }
+    }
+
+    // vẽ từng node
+    for (auto &n : nodes)
+    {
+        SDL_Rect nodeRect = {static_cast<int>(n.getX()), static_cast<int>(n.getY()), 14, 14};
+        SDL_SetRenderDrawColor(renderer, 200, 0, 0, 255); // Node màu đỏ
+        SDL_RenderFillRect(renderer, &nodeRect);
+
+        renderText(renderer, fontSmall, n.getNodeID(),
+                   static_cast<int>(n.getX()) - 5,
+                   static_cast<int>(n.getY()) - 18,
+                   textColor);
     }
 
     // Vẽ từng drone

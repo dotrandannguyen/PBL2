@@ -1,6 +1,7 @@
 #include "StatisticsPage.h"
 
 vector<graphBoxes> gBox;
+vector<float> greedyTimes;
 
 void drawPoint(SDL_Renderer *renderer, int cx, int cy, int r, SDL_Color color)
 {
@@ -33,11 +34,25 @@ void drawGraph(SDL_Renderer *renderer, TTF_Font *font, graphBoxes gBox)
     SDL_RenderDrawLine(renderer, graphLeft, graphTop, graphLeft, graphBottom);
     SDL_RenderDrawLine(renderer, graphLeft, graphBottom, graphRight - 140, graphBottom);
 
-    vector<int> point1 = {10, 20, 25, 35, 40, 45};
-    vector<int> point2 = {12, 25, 30, 40, 45, 50};
+    // vector<int> point1 = {10, 12, 15, 17, 19, 20, 22, 24, 25, 27, 28, 30, 31, 33, 35, 36, 38, 39, 40, 42};
+    vector<float> point1 = greedyTimes;
+    // vector<int> point2 = {9, 11, 13, 15, 18, 19, 21, 23, 25, 26, 27, 29, 30, 32, 34, 35, 36, 38, 39, 41};
 
     int n = point1.size();
-    int maxValue = 50;
+
+    // tinh maxVlue để scale
+    float maxValue = 0;
+    for (auto v : point1)
+    {
+        maxValue = max(maxValue, v);
+    }
+
+    // for (auto v : point2)
+    // {
+    //     maxValue = max(maxValue, v);
+    // }
+    maxValue = (maxValue / 10 + 1) * 10; // lam tron
+
     int graphWidth = graphRight - 140 - graphLeft;
     int graphHeight = graphBottom - graphTop;
 
@@ -46,21 +61,30 @@ void drawGraph(SDL_Renderer *renderer, TTF_Font *font, graphBoxes gBox)
 
     for (int i = 0; i < n - 1; i++)
     {
-        int x1 = graphLeft + (graphWidth / (n - 1)) * i;
-        int x2 = graphLeft + (graphWidth / (n - 1)) * (i + 1);
+        float x1 = graphLeft + (graphWidth / (float)(n - 1)) * i;
+        float x2 = graphLeft + (graphWidth / (float)(n - 1)) * (i + 1);
 
-        int y1A = graphBottom - (point1[i] * graphHeight / maxValue);
-        int y2A = graphBottom - (point1[i + 1] * graphHeight / maxValue);
-        int y1D = graphBottom - (point2[i] * graphHeight / maxValue);
-        int y2D = graphBottom - (point2[i + 1] * graphHeight / maxValue);
+        float y1A = graphBottom - (point1[i] * graphHeight / (float)maxValue);
+        float y2A = graphBottom - (point1[i + 1] * graphHeight / (float)maxValue);
+        // float y1D = graphBottom - (point2[i] * graphHeight / (float)maxValue);
+        // float y2D = graphBottom - (point2[i + 1] * graphHeight / (float)maxValue);
 
         SDL_SetRenderDrawColor(renderer, colorLine1.r, colorLine1.g, colorLine1.b, colorLine1.a);
-        SDL_RenderDrawLine(renderer, x1, y1A, x2, y2A);
-        drawPoint(renderer, x1, y1A, 3, colorLine1);
+        SDL_RenderDrawLine(renderer, (int)x1, (int)y1A, (int)x2, (int)y2A);
+        drawPoint(renderer, (int)x1, (int)y1A, 3, colorLine1);
 
         SDL_SetRenderDrawColor(renderer, colorLine2.r, colorLine2.g, colorLine2.b, colorLine2.a);
-        SDL_RenderDrawLine(renderer, x1, y1D, x2, y2D);
-        drawPoint(renderer, x1, y1D, 3, colorLine2);
+        // SDL_RenderDrawLine(renderer, (int)x1, (int)y1D, (int)x2, (int)y2D);
+        // drawPoint(renderer, (int)x1, (int)y1D, 3, colorLine2);
+
+        // truc Ox:
+
+        int x = graphLeft + (graphWidth / (float)(n - 1)) * i;
+        renderText(renderer, font, to_string(i), x - 5, graphBottom + 5, {0, 0, 0, 255});
+
+        // truc Oy:
+        int y = graphBottom - (point1[i] * graphHeight / (int)maxValue);
+        renderText(renderer, font, to_string((int)point1[i]), graphLeft - 30, y - 8, {0, 0, 0, 255});
     }
 
     // chu thich
@@ -86,6 +110,7 @@ void drawGraph(SDL_Renderer *renderer, TTF_Font *font, graphBoxes gBox)
 
 void renderStatisticsPage(SDL_Renderer *renderer, TTF_Font *font, int startX)
 {
+
     int winW, winH;
     SDL_GetRendererOutputSize(renderer, &winW, &winH);
     // phan chia 4 ô
@@ -106,14 +131,14 @@ void renderStatisticsPage(SDL_Renderer *renderer, TTF_Font *font, int startX)
     SDL_Rect boxes[4];
     boxes[0] = {contentLeft, contentTop, cellW, cellH};
     vector<string> se;
-    se.push_back("Astar");
-    se.push_back("Dijkstra");
+    se.push_back("Greedy");
+    se.push_back("Hungary");
     gBox.push_back({boxes[0], se});
 
     boxes[1] = {contentLeft + cellW + 20, contentTop, cellW, cellH};
     se.clear();
-    se.push_back("Greedy");
-    se.push_back("Hungray");
+    se.push_back("Astar");
+    se.push_back("Dijkstra");
     gBox.push_back({boxes[1], se});
     boxes[2] = {contentLeft, contentTop + cellH + 20, cellW, cellH};
     se.clear();

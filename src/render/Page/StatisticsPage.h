@@ -15,6 +15,8 @@ struct graphBoxes
     vector<string> s;
 };
 
+extern vector<float> greedyTimes;
+
 void renderStatisticsPage(SDL_Renderer *renderer, TTF_Font *font, int startX);
 
 #endif
