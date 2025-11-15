@@ -88,74 +88,6 @@ vector<Node> convertPathToNodes(const vector<string> &pathIDs, const vector<Node
     return result;
 }
 
-// void assignOrdersGreedy(vector<Drone> &drones, vector<Order> &orders, const vector<Node> &nodes, const vector<Edge> &edges)
-// {
-//     // cout << "[DEBUGDRONE] vi tri drone0 " << drones[0].getX() << " " << drones[0].getY() << endl;
-//     // cout << "[DEBUGDRONE] vi tri drone1 " << drones[1].getX() << " " << drones[1].getY() << endl;
-//     // cout << "[DEBUG] assignOrdersGreedy duoc goi!" << endl;
-//     for (auto &order : orders)
-//     {
-//         if (order.getStatus() != "pending")
-//             continue;
-
-//         // lấy điểm lấy hàng và điểm giao hàng
-//         string pickup = order.getPickupLocation();
-//         string dropoff = order.getDropoffLocation();
-
-//         float bestCost = INF;
-//         int bestDroneIndex = -1;
-//         vector<string> bestPathToPickUp; // luu path tu drone -> lay hang
-//         for (int i = 0; i < (int)drones.size(); i++)
-//         {
-//             Drone &d = drones[i];
-//             if (d.getStatus() != "idle")
-//                 continue;
-
-//             string start = findClosestNodeID(d, nodes);
-//             // cout << "[DEBUGSTART]" << start << endl;
-//             // lay toa do cau drone o node nao lam diem start -> sau nay bo sug class sau
-//             // string start = d.getCurrentNodeID(); // Drone luôn nằm trên node
-
-//             vector<string> path = astar(start, pickup); // tìm path từ node start -> diem lay hang
-
-//             if (path.empty())
-//                 continue;
-
-//             float cost = TotalPathDistance(path, edges);
-
-//             if (cost < bestCost)
-//             {
-//                 bestCost = cost;
-//                 bestDroneIndex = i;
-//                 bestPathToPickUp = path;
-//             }
-//         }
-
-//         // Sau khi duyệt hết drone, nếu tìm được bestDroneIndex thì gán order
-//         if (bestDroneIndex != -1)
-//         {
-//             // Lấy path từ pickup -> dropoff (để drone bay tiếp sau khi lấy hàng)
-//             vector<string> pickupToDrop = astar(pickup, dropoff);
-
-//             // Gộp path từ drone->pickup + pickup->dropoff
-//             vector<string> fullPath = bestPathToPickUp;
-//             if (!pickupToDrop.empty())
-//             {
-//                 fullPath.insert(fullPath.end(), pickupToDrop.begin() + 1, pickupToDrop.end());
-//             }
-
-//             // Chuyển fullPath (nodeID) sang vector<Node> để setPath cho drone
-//             vector<Node> fullNodePath = convertPathToNodes(fullPath, nodes);
-
-//             drones[bestDroneIndex].setPath(fullNodePath); // Drone lưu path để updateMove() dùng
-
-//             // Cập nhật trạng thái
-//             drones[bestDroneIndex].setStatus("moving");
-//             order.setStatus("moving");
-//         }
-//     }
-// }
-
 void assignOrdersGreedy(vector<Drone> &drones, vector<Order> &orders, const vector<Node> &nodes, const vector<Edge> &edges)
 {
     // với mỗi drone rảnh, tìm order pending gần nhất
@@ -193,11 +125,6 @@ void assignOrdersGreedy(vector<Drone> &drones, vector<Order> &orders, const vect
 
         if (bestOrderIndex != -1)
         {
-            auto endTime = chrono::high_resolution_clock::now();
-            float duration = chrono::duration<float, milli>(endTime - startTime).count();
-            greedyTimes.push_back(duration);
-            cout << "Drone " << i << " assign time: " << duration << " ms\n";
-            cout << "size" << greedyTimes.size() << endl;
 
             Order &o = orders[bestOrderIndex];
             // path pickup -> dropoff
@@ -215,6 +142,11 @@ void assignOrdersGreedy(vector<Drone> &drones, vector<Order> &orders, const vect
             d.setStatus("moving");
             d.setAssignedOrderID(o.getOrderID()); // lien ket order voi drone lien ket 1-1
             o.setStatus("moving");                // đánh dấu order đã được gán
+            auto endTime = chrono::high_resolution_clock::now();
+            float duration = chrono::duration<float, milli>(endTime - startTime).count();
+            greedyTimes.push_back(duration);
+            cout << "[Greedy] Drone " << i << " assigned to Order " << o.getOrderID()
+                 << " in " << duration << " ms" << endl;
         }
     }
 }

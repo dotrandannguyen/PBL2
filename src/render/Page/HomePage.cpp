@@ -1,10 +1,13 @@
 #include "HomePage.h"
 
 // Biến toàn cục để lưu drone nào đang được chọn
+bool isAddingDrone = false;
+bool isAddingNode = false;
 int selectedDroneIndex = -1;
 bool showInfoPanel = false;
 bool isShowEdge = false;
 bool isNoFly = false;
+bool isAlgorithm = false;
 
 SDL_Point getDronePosXY(const string &pos)
 {
@@ -29,7 +32,7 @@ void renderHomePage(SDL_Renderer *renderer, TTF_Font *fontSmall, const vector<Dr
 {
     SDL_Color textColor = {0, 0, 0, 255};
 
-        // vẽ các cạnh giữa các node neu show
+    // vẽ các cạnh giữa các node neu show
     if (isShowEdge)
     {
         for (auto &e : edges)
@@ -175,6 +178,12 @@ void renderHomePage(SDL_Renderer *renderer, TTF_Font *fontSmall, const vector<Dr
     SDL_RenderFillRect(renderer, &edgeShowBtn);
     renderText(renderer, fontSmall, isShowEdge ? "Edges show: on" : "Edges show: off", edgeShowBtn.x + 10, edgeShowBtn.y + 5, {255, 255, 255, 255});
 
+    // nút thuật toán nào hoạt động
+    SDL_Rect algorithmBtn = {w - 440, 20, 100, 30};
+    SDL_SetRenderDrawColor(renderer, 50, 150, 255, 255);
+    SDL_RenderFillRect(renderer, &algorithmBtn);
+    renderText(renderer, fontSmall, "Greedy", algorithmBtn.x + 10, algorithmBtn.y + 5, {255, 255, 255, 255});
+
     if (showInfoPanel)
     {
         int infoW = 280, infoH = 220;
@@ -319,6 +328,19 @@ void handleHomePageShowEdgeClick(SDL_Renderer *renderer, int mx, int my)
     }
 }
 
+void handleHomePageAlgorithmClick(SDL_Renderer *renderer, int mx, int my)
+{
+    int w, h;
+    SDL_GetRendererOutputSize(renderer, &w, &h);
+    SDL_Rect algorithmBtn = {w - 440, 20, 100, 30};
+    cout << "trc click:" << isAlgorithm << endl;
+    if (isMouseInside(algorithmBtn, mx, my))
+    {
+        isAlgorithm = !isAlgorithm;
+    }
+    cout << "sau click:" << isAlgorithm << endl;
+}
+
 void handleAddNoFlyArea(int mx, int my)
 {
     float radius = 50.0f;
@@ -338,25 +360,6 @@ void handleHomePageNoFlyClick(SDL_Renderer *renderer, int mx, int my)
         isNoFly = true;
     }
 }
-
-// // Xử lý click chọn vị trí drone mới
-// void handleAddDroneClick(int mx, int my, vector<Drone> &drones)
-// {
-//     if (!isAddingDrone)
-//         return;
-
-//     int idNum = drones.size() + 1;
-//     string newID = "D00" + to_string(idNum);
-//     string name = "Drone_" + to_string(idNum);
-
-//     // Tạo drone mới trực tiếp với tọa độ click
-//     Drone newDrone(newID, name, static_cast<float>(mx), static_cast<float>(my), 40.0f, 100, "idle");
-//     drones.push_back(newDrone);
-
-//     writeDronesToFile("D:/Drone-project/src/data/Drone.txt", drones);
-
-//     isAddingDrone = false;
-// }
 
 void handleHomePageNodeClick(SDL_Renderer *renderer, int mx, int my)
 {

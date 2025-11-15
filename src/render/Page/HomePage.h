@@ -17,6 +17,7 @@ extern bool isAddingDrone;
 extern bool isAddingNode;
 extern bool showInfoPanel;
 extern bool isNoFly;
+extern bool isAlgorithm;
 
 struct NoFlyZone
 {
@@ -33,6 +34,7 @@ void handleHomePageDroneClick(SDL_Renderer *renderer, int mx, int my, vector<Dro
 // void handleAddDroneClick(int mx, int my, vector<Drone> &drones);
 void hanldeHomePageInfoClick(SDL_Renderer *renderer, int mx, int my);
 void handleHomePageShowEdgeClick(SDL_Renderer *renderer, int mx, int my);
+void handleHomePageAlgorithmClick(SDL_Renderer *renderer, int mx, int my);
 void handleAddNoFlyArea(int mx, int my);
 void handleHomePageNoFlyClick(SDL_Renderer *renderer, int mx, int my);
 void handleHomePageNodeClick(SDL_Renderer *renderer, int mx, int my);

@@ -7,10 +7,15 @@
 #include "../../core/Order.h"
 #include "../../core/Node.h"
 #include "../../core/Edge.h"
+#include "../PathFinder/AStar.h"
+#include "../PathFinder/Dijkstra.h"
+#include "Greedy.h"                           // Dùng lại các hàm findClosestNodeID, TotalPathDistance, convertPathToNodes
+#include "../../render/Page/StatisticsPage.h" // hungaryTimes
+#include <algorithm>
+#include <chrono>
+#include <cmath>
 
 using namespace std;
-
-const float INF = 1e9;
 
 vector<int> hungarian(const vector<vector<float>> &costMatrix);
 

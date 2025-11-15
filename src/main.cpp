@@ -15,13 +15,11 @@
 #include "render/Page/DronePage.h"
 #include "render/Page/NotificationPage.h"
 #include "render/Page/StatisticsPage.h"
-#include "algorithm/PathFinder/Dijkstra.h"
+#include "algorithm/Assignment/Hungarian.h"
 #include "algorithm/Assignment/Greedy.h"
 #include "utils/notification.h"
 using namespace std;
 
-bool isAddingDrone = false;
-bool isAddingNode = false;
 bool isAddingOrder = false;
 
 vector<Drone> drones = readDronesFromFile("D:/Drone-project/src/data/Drone.txt");
@@ -163,6 +161,7 @@ int main(int argc, char *argv[])
                     handleHomePageShowEdgeClick(renderer, mx, my);
                     handleHomePageDroneClick(renderer, mx, my, drones, nodes);
 
+                    handleHomePageAlgorithmClick(renderer, mx, my);
                     if (isAddingNode)
                     {
                         handleAddNodeClick(mx, my, nodes, edges);
@@ -267,21 +266,40 @@ int main(int argc, char *argv[])
             {
                 if (!isMoving)
                 {
-
-                    for (auto &d : drones)
+                    if (isAlgorithm)
                     {
+                        for (auto &d : drones)
+                        {
 
-                        snapDroneToNode(d, nodes);
+                            snapDroneToNode(d, nodes);
+                        }
+                        lastTime = chrono::high_resolution_clock::now();
+                        isMoving = true;
+                        hasStart = true;
+
+                        //  Gọi Greedy assign Orders cho drones
+
+                        assignOrdersGreedy(drones, orders, nodes, edges);
+
+                        logMessage("[DEBUG] assignOrdersGreedy trong while duoc goi!");
                     }
-                    lastTime = chrono::high_resolution_clock::now();
-                    isMoving = true;
-                    hasStart = true;
+                    else
+                    {
+                        for (auto &d : drones)
+                        {
 
-                    //  Gọi Greedy assign Orders cho drones
+                            snapDroneToNode(d, nodes);
+                        }
+                        lastTime = chrono::high_resolution_clock::now();
+                        isMoving = true;
+                        hasStart = true;
 
-                    assignOrdersGreedy(drones, orders, nodes, edges);
+                        //  Gọi Greedy assign Orders cho drones
 
-                    logMessage("[DEBUG] assignOrdersGreedy trong while duoc goi!");
+                        assignOrdersHungarian(drones, orders, nodes, edges);
+
+                        logMessage("[DEBUG] assignOrdersHungarian trong while duoc goi!");
+                    }
                 }
             }
         }

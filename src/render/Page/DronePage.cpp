@@ -70,7 +70,7 @@ void renderDronePage(SDL_Renderer *renderer, TTF_Font *font, const vector<Drone>
 
     //  Vẽ dữ liệu drone
 
-    // --- PHÂN TRANG ---
+    // PHÂN TRANG
     droneButtons.clear();
     int totalDrones = drones.size();
     int totalPages = (totalDrones + DRONES_PER_PAGE - 1) / DRONES_PER_PAGE;

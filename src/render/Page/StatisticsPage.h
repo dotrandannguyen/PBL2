@@ -5,6 +5,7 @@
 #include <SDL2/SDL_ttf.h>
 #include <vector>
 #include <string>
+#include <cmath>
 #include "../Renderer.h"
 
 using namespace std;
@@ -16,6 +17,7 @@ struct graphBoxes
 };
 
 extern vector<float> greedyTimes;
+extern vector<float> hungaryTimes;
 
 void renderStatisticsPage(SDL_Renderer *renderer, TTF_Font *font, int startX);
 
