@@ -50,7 +50,7 @@ void renderHomePage(SDL_Renderer *renderer, TTF_Font *fontSmall, const vector<Dr
 
             if (startNode && endNode)
             {
-                SDL_SetRenderDrawColor(renderer, 100, 100, 100, 255);
+                SDL_SetRenderDrawColor(renderer, 150, 150, 150, 255);
                 SDL_RenderDrawLine(renderer,
                                    static_cast<int>(startNode->getX()) + 10,
                                    static_cast<int>(startNode->getY()) + 10,
@@ -180,9 +180,18 @@ void renderHomePage(SDL_Renderer *renderer, TTF_Font *fontSmall, const vector<Dr
 
     // nút thuật toán nào hoạt động
     SDL_Rect algorithmBtn = {w - 440, 20, 100, 30};
-    SDL_SetRenderDrawColor(renderer, 50, 150, 255, 255);
+
+    if (isAlgorithm)
+    {
+        SDL_SetRenderDrawColor(renderer, 0, 200, 0, 255);
+    }
+    else
+    {
+        SDL_SetRenderDrawColor(renderer, 255, 0, 0, 255);
+    }
+
     SDL_RenderFillRect(renderer, &algorithmBtn);
-    renderText(renderer, fontSmall, "Greedy", algorithmBtn.x + 10, algorithmBtn.y + 5, {255, 255, 255, 255});
+    renderText(renderer, fontSmall, isAlgorithm ? "Greedy" : "Hungary", algorithmBtn.x + 10, algorithmBtn.y + 5, {255, 255, 255, 255});
 
     if (showInfoPanel)
     {
@@ -333,12 +342,11 @@ void handleHomePageAlgorithmClick(SDL_Renderer *renderer, int mx, int my)
     int w, h;
     SDL_GetRendererOutputSize(renderer, &w, &h);
     SDL_Rect algorithmBtn = {w - 440, 20, 100, 30};
-    cout << "trc click:" << isAlgorithm << endl;
+
     if (isMouseInside(algorithmBtn, mx, my))
     {
         isAlgorithm = !isAlgorithm;
     }
-    cout << "sau click:" << isAlgorithm << endl;
 }
 
 void handleAddNoFlyArea(int mx, int my)
