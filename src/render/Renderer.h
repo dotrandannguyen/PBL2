@@ -5,6 +5,15 @@
 #include <SDL2/SDL_image.h>
 #include <iostream>
 #include <string>
+#include <cmath>
+
+#include "../core/Drone.h"
+#include "../core/Node.h"
+#include "../core/Order.h"
+#include "../core/Edge.h"
+#include "Page/StatisticsPage.h"
+#include "../algorithm/Assignment/Greedy.h"
+#include "../algorithm/Assignment/Hungarian.h"
 
 using namespace std;
 
@@ -20,3 +29,9 @@ SDL_Texture *loadTexture(SDL_Renderer *renderer, const string &file);
 void renderTexture(SDL_Renderer *renderer, SDL_Texture *texture, int x, int y, int w, int h);
 // Tính khoảng cách giữa 2 node
 float calculateDistance(float x1, float y1, float x2, float y2);
+
+void runBothAlgorithms(const vector<Drone> &drones,
+                       const vector<Order> &orders,
+                       const vector<Node> &nodes,
+                       const vector<Edge> &edges,
+                       bool isAlgorithm);

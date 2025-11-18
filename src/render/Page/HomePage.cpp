@@ -9,6 +9,8 @@ bool isShowEdge = false;
 bool isNoFly = false;
 bool isAlgorithm = false;
 
+vector<NoFlyZone> noFlyZones;
+
 SDL_Point getDronePosXY(const string &pos)
 {
     if (pos.size() < 2)

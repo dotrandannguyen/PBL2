@@ -24,6 +24,7 @@ private:
 
 public:
     Task() = default;
+
     Task(string taskId, Drone *d, Order *o, string algo, float pathLen, float duration, string status);
     // Constructor đọc file (chỉ lưu ID, chưa có con trỏ)
     Task(string taskId, string droneId, string orderId, string algo, float pathLen, float duration, string status);

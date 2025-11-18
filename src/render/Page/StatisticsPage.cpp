@@ -22,21 +22,21 @@ void drawPoint(SDL_Renderer *renderer, int cx, int cy, int r, SDL_Color color)
     }
 }
 
-void drawGraph(SDL_Renderer *renderer, TTF_Font *font, graphBoxes gBox)
+void drawGraph(SDL_Renderer *renderer, TTF_Font *font, graphBoxes gB)
 {
     //
     int margin = 80;
-    int graphLeft = gBox.boxes.x + margin;
-    int graphRight = gBox.boxes.x + gBox.boxes.w - margin;
-    int graphTop = gBox.boxes.y + margin;
-    int graphBottom = gBox.boxes.y + gBox.boxes.h - margin;
+    int graphLeft = gB.boxes.x + margin;
+    int graphRight = gB.boxes.x + gB.boxes.w - margin;
+    int graphTop = gB.boxes.y + margin;
+    int graphBottom = gB.boxes.y + gB.boxes.h - margin;
 
     SDL_SetRenderDrawColor(renderer, 0, 0, 0, 255);
     SDL_RenderDrawLine(renderer, graphLeft, graphTop - 30, graphLeft, graphBottom);
     SDL_RenderDrawLine(renderer, graphLeft, graphBottom, graphRight - 140, graphBottom);
 
-    vector<float> point1 = greedyTimes;
-    vector<float> point2 = hungaryTimes;
+    vector<float> point1 = gB.line1;
+    vector<float> point2 = gB.line2;
 
     int n = point1.size();
     int n1 = point2.size();
@@ -141,8 +141,8 @@ void drawGraph(SDL_Renderer *renderer, TTF_Font *font, graphBoxes gBox)
     SDL_Rect noteRect = {legendLeft + 20, legendTop, legendWidth, 20};
 
     int textW, textH;
-    string m = gBox.s[0];
-    string h = gBox.s[1];
+    string m = gB.s[0];
+    string h = gB.s[1];
     TTF_SizeText(font, m.c_str(), &textW, &textH);
 
     drawPoint(renderer, noteRect.x + 20, noteRect.y + noteRect.h / 2, 4, colorLine1);
@@ -171,29 +171,33 @@ void renderStatisticsPage(SDL_Renderer *renderer, TTF_Font *font, int startX)
     int cellW = contentWidth / 2 - 40;
     int cellH = contentHeight / 2 - 40;
 
+    vector<float> fakeLine1 = {100, 200, 240, 250};
+    vector<float> fakeLine2 = {50, 100, 200, 240};
+
     SDL_Rect boxes[4];
     boxes[0] = {contentLeft, contentTop, cellW, cellH};
     vector<string> se;
     se.push_back("Greedy");
     se.push_back("Hungary");
-    gBox.push_back({boxes[0], se});
+    gBox.push_back({boxes[0], se, greedyTimes, hungaryTimes});
 
     boxes[1] = {contentLeft + cellW + 20, contentTop, cellW, cellH};
     se.clear();
     se.push_back("Astar");
     se.push_back("Dijkstra");
-    gBox.push_back({boxes[1], se});
+    gBox.push_back({boxes[1], se, fakeLine1, fakeLine2});
     boxes[2] = {contentLeft, contentTop + cellH + 20, cellW, cellH};
     se.clear();
     se.push_back("Orders");
     se.push_back("Drones");
-    gBox.push_back({boxes[2], se});
+    gBox.push_back({boxes[2], se, fakeLine1, fakeLine2});
     boxes[3] = {contentLeft + cellW + 20, contentTop + cellH + 20, cellW, cellH};
     se.clear();
     se.push_back("Time");
     se.push_back("Quantities");
-    gBox.push_back({boxes[3], se});
+    gBox.push_back({boxes[3], se, fakeLine1, fakeLine2});
     SDL_SetRenderDrawColor(renderer, 0, 0, 0, 255);
+
     for (auto &b : boxes)
     {
         SDL_RenderDrawRect(renderer, &b);

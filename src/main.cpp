@@ -38,8 +38,6 @@ struct Button
 vector<DroneButton> droneButtons;
 vector<OrderButton> orderButtons;
 
-vector<NoFlyZone> noFlyZones;
-
 int main(int argc, char *argv[])
 {
     SDL_SetMainReady();
@@ -266,40 +264,28 @@ int main(int argc, char *argv[])
             {
                 if (!isMoving)
                 {
+
+                    for (auto &d : drones)
+                    {
+
+                        snapDroneToNode(d, nodes);
+                    }
+                    lastTime = chrono::high_resolution_clock::now();
+                    isMoving = true;
+                    hasStart = true;
+
+                    runBothAlgorithms(drones, orders, nodes, edges, isAlgorithm);
+                    //  Gọi Greedy assign Orders cho drones
                     if (isAlgorithm)
                     {
-                        for (auto &d : drones)
-                        {
-
-                            snapDroneToNode(d, nodes);
-                        }
-                        lastTime = chrono::high_resolution_clock::now();
-                        isMoving = true;
-                        hasStart = true;
-
-                        //  Gọi Greedy assign Orders cho drones
-
                         assignOrdersGreedy(drones, orders, nodes, edges);
-
-                        logMessage("[DEBUG] assignOrdersGreedy trong while duoc goi!");
                     }
                     else
                     {
-                        for (auto &d : drones)
-                        {
-
-                            snapDroneToNode(d, nodes);
-                        }
-                        lastTime = chrono::high_resolution_clock::now();
-                        isMoving = true;
-                        hasStart = true;
-
-                        //  Gọi Greedy assign Orders cho drones
-
                         assignOrdersHungarian(drones, orders, nodes, edges);
-
-                        logMessage("[DEBUG] assignOrdersHungarian trong while duoc goi!");
                     }
+
+                    logMessage("[DEBUG] assignOrdersGreedy trong while duoc goi!");
                 }
             }
         }
@@ -320,8 +306,19 @@ int main(int argc, char *argv[])
                 if (hasPendingOrder)
                 {
                     logMessage("[SYSTEM] Co don hang moi, khoi dong lai drone");
-                    cout << "[DEBUG] assignOrdersGreedy trong newOrder duoc goi!" << endl;
-                    assignOrdersGreedy(drones, orders, nodes, edges);
+
+                    if (isAlgorithm)
+
+                    {
+                        cout << "[DEBUG] assignOrdersGreedy trong newOrder duoc goi!" << endl;
+                        assignOrdersGreedy(drones, orders, nodes, edges);
+                    }
+                    else
+                    {
+                        cout << "[DEBUG] assignOrdersHungary trong newOrder duoc goi!" << endl;
+                        assignOrdersHungarian(drones, orders, nodes, edges);
+                    }
+
                     isMoving = true;
                     hasNewOrder = false;
                     lastTime = chrono::high_resolution_clock::now();
@@ -417,7 +414,14 @@ int main(int argc, char *argv[])
                 {
 
                     logMessage("[DEBUG] assignOrdersGreedy trong Finished duoc goi!");
-                    assignOrdersGreedy(drones, orders, nodes, edges);
+                    if (isAlgorithm)
+                    {
+                        assignOrdersGreedy(drones, orders, nodes, edges);
+                    }
+                    else
+                    {
+                        assignOrdersHungarian(drones, orders, nodes, edges);
+                    }
                 }
             }
         }

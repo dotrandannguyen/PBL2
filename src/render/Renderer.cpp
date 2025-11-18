@@ -1,6 +1,5 @@
 #include "Renderer.h"
-#include <string>
-#include <cmath>
+
 using namespace std;
 bool isMouseInside(const SDL_Rect &rect, int mx, int my)
 {
@@ -49,4 +48,35 @@ void renderTexture(SDL_Renderer *renderer, SDL_Texture *texture, int x, int y, i
 float calculateDistance(float x1, float y1, float x2, float y2)
 {
     return sqrt(pow(x2 - x1, 2) + pow(y2 - y1, 2));
+}
+
+void runBothAlgorithms(const vector<Drone> &drones,
+                       const vector<Order> &orders,
+                       const vector<Node> &nodes,
+                       const vector<Edge> &edges,
+                       bool isAlgorithm)
+{
+    // Snapshot dữ liệu gốc
+    vector<Drone> d1 = drones, d2 = drones;
+    vector<Order> o1 = orders, o2 = orders;
+    vector<Node> n1 = nodes, n2 = nodes;
+    vector<Edge> e1 = edges, e2 = edges;
+
+    if (isAlgorithm)
+    {
+
+        // Chạy Hungarian
+
+        assignOrdersHungarian(d2, o2, n2, e2);
+
+        // cout << "[INFO] Hungary (ngam) hoat dong" << endl;
+    }
+    else
+    {
+
+        // Chạy Greedy
+
+        assignOrdersGreedy(d1, o1, n1, e1);
+        // cout << "[INFO] Greedy (ngam) hoat dong" << endl;
+    }
 }

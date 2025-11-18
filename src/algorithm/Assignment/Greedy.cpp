@@ -52,7 +52,7 @@ float TotalPathDistance(const vector<string> &path, const vector<Edge> &edges)
 
     float total = 0.0f;
 
-    for (int i = 0; i + 1 < path.size(); i++)
+    for (size_t i = 0; i + 1 < path.size(); i++)
     {
         const string &a = path[i];
         const string &b = path[i + 1];
@@ -91,6 +91,7 @@ vector<Node> convertPathToNodes(const vector<string> &pathIDs, const vector<Node
 void assignOrdersGreedy(vector<Drone> &drones, vector<Order> &orders, const vector<Node> &nodes, const vector<Edge> &edges)
 {
     // với mỗi drone rảnh, tìm order pending gần nhất
+    // cout << "[DEBUG GREEDY] GREEDY duoc goi" << endl;
     auto startTime = chrono::high_resolution_clock::now();
     for (int i = 0; i < (int)drones.size(); ++i)
     {
@@ -145,8 +146,8 @@ void assignOrdersGreedy(vector<Drone> &drones, vector<Order> &orders, const vect
             auto endTime = chrono::high_resolution_clock::now();
             float duration = chrono::duration<float, milli>(endTime - startTime).count();
             greedyTimes.push_back(duration);
-            cout << "[Greedy] Drone " << i << " assigned to Order " << o.getOrderID()
-                 << " in " << duration << " ms" << endl;
+            // cout << "[Greedy] Drone " << i << " assigned to Order " << o.getOrderID()
+            //      << " in " << duration << " ms" << endl;
         }
     }
 }

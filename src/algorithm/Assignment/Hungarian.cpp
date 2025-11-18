@@ -81,14 +81,15 @@ void assignOrdersHungarian(vector<Drone> &drones,
                            const vector<Node> &nodes,
                            const vector<Edge> &edges)
 {
+    // cout << "[DEBUG HUNGARY] Hungary duoc goi" << endl;
     auto startTime = chrono::high_resolution_clock::now();
     // Lọc drone rảnh và order pending
     vector<int> idleIdx, pendingIdx;
-    for (int i = 0; i < drones.size(); ++i)
+    for (size_t i = 0; i < drones.size(); ++i)
         if (drones[i].getStatus() == "idle")
             idleIdx.push_back(i);
 
-    for (int j = 0; j < orders.size(); ++j)
+    for (size_t j = 0; j < orders.size(); ++j)
         if (orders[j].getStatus() == "pending")
             pendingIdx.push_back(j);
 
@@ -119,7 +120,7 @@ void assignOrdersHungarian(vector<Drone> &drones,
         }
     }
 
-        // Bước 2: Chạy Hungarian
+    // Bước 2: Chạy Hungarian
     vector<int> assignment = hungarian(cost);
 
     // Bước 3: Gán và thiết lập đường đi
@@ -157,7 +158,7 @@ void assignOrdersHungarian(vector<Drone> &drones,
         auto endTime = chrono::high_resolution_clock::now();
         float duration = chrono::duration<float, milli>(endTime - startTime).count();
         hungaryTimes.push_back(duration);
-        cout << "[Hungarian] Drone " << droneIdx << " assigned to Order " << orderIdx
-             << " in " << duration << " ms" << endl;
+        // cout << "[Hungarian] Drone " << droneIdx << " assigned to Order " << orderIdx
+        //      << " in " << duration << " ms" << endl;
     }
 }

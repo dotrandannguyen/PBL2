@@ -10,6 +10,7 @@
 #include "../../core/Edge.h"
 #include "../../core/Order.h"
 #include "../Renderer.h"
+#include "../../utils/NoFLyZone.h"
 using namespace std;
 
 extern bool isShowEdge;
@@ -18,11 +19,6 @@ extern bool isAddingNode;
 extern bool showInfoPanel;
 extern bool isNoFly;
 extern bool isAlgorithm;
-
-struct NoFlyZone
-{
-    float x, y, r;
-};
 
 extern vector<NoFlyZone> noFlyZones;
 

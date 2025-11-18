@@ -14,6 +14,8 @@ struct graphBoxes
 {
     SDL_Rect boxes;
     vector<string> s;
+    vector<float> line1;
+    vector<float> line2;
 };
 
 extern vector<float> greedyTimes;
