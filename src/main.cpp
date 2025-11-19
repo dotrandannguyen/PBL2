@@ -274,7 +274,7 @@ int main(int argc, char *argv[])
                     isMoving = true;
                     hasStart = true;
 
-                    runBothAlgorithms(drones, orders, nodes, edges, isAlgorithm);
+                    runAlgorithms(drones, orders, nodes, edges, isAlgorithm);
                     //  Gọi Greedy assign Orders cho drones
                     if (isAlgorithm)
                     {

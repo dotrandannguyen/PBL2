@@ -3,6 +3,8 @@
 vector<graphBoxes> gBox;
 vector<float> greedyTimes;
 vector<float> hungaryTimes;
+vector<float> astarVisited;
+vector<float> dijkstraVisited;
 
 void drawPoint(SDL_Renderer *renderer, int cx, int cy, int r, SDL_Color color)
 {
@@ -185,7 +187,7 @@ void renderStatisticsPage(SDL_Renderer *renderer, TTF_Font *font, int startX)
     se.clear();
     se.push_back("Astar");
     se.push_back("Dijkstra");
-    gBox.push_back({boxes[1], se, fakeLine1, fakeLine2});
+    gBox.push_back({boxes[1], se, astarVisited, dijkstraVisited});
     boxes[2] = {contentLeft, contentTop + cellH + 20, cellW, cellH};
     se.clear();
     se.push_back("Orders");

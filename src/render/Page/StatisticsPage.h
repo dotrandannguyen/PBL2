@@ -20,6 +20,8 @@ struct graphBoxes
 
 extern vector<float> greedyTimes;
 extern vector<float> hungaryTimes;
+extern vector<float> astarVisited;
+extern vector<float> dijkstraVisited;
 
 void renderStatisticsPage(SDL_Renderer *renderer, TTF_Font *font, int startX);
 

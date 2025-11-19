@@ -1,4 +1,5 @@
-#pragma once
+#ifndef RENDERER_H
+#define RENDERER_H
 
 #include <SDL2/SDL.h>
 #include <SDL2/SDL_ttf.h>
@@ -12,6 +13,8 @@
 #include "../core/Order.h"
 #include "../core/Edge.h"
 #include "Page/StatisticsPage.h"
+#include "../algorithm/PathFinder/AStar.h"
+#include "../algorithm/PathFinder/Dijkstra.h"
 #include "../algorithm/Assignment/Greedy.h"
 #include "../algorithm/Assignment/Hungarian.h"
 
@@ -30,8 +33,10 @@ void renderTexture(SDL_Renderer *renderer, SDL_Texture *texture, int x, int y, i
 // Tính khoảng cách giữa 2 node
 float calculateDistance(float x1, float y1, float x2, float y2);
 
-void runBothAlgorithms(const vector<Drone> &drones,
-                       const vector<Order> &orders,
-                       const vector<Node> &nodes,
-                       const vector<Edge> &edges,
-                       bool isAlgorithm);
+void runAlgorithms(const vector<Drone> &drones,
+                   const vector<Order> &orders,
+                   const vector<Node> &nodes,
+                   const vector<Edge> &edges,
+                   bool isAlgorithm);
+
+#endif

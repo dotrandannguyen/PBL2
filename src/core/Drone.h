@@ -1,5 +1,7 @@
 
-#pragma once
+#ifndef DRONE_H
+#define DRONE_H
+
 #include <string>
 #include <vector>
 #include <cmath>
@@ -56,3 +58,5 @@ public:
 };
 vector<Drone> readDronesFromFile(const string &filename);
 void writeDronesToFile(const string &filename, const vector<Drone> &drones);
+
+#endif

@@ -1,5 +1,17 @@
 #include "AStar.h"
 
+int ASTAR_VISITED;
+
+int astarNodeVisited(const string &start, const string &end)
+{
+    // reset
+    ASTAR_VISITED = 0;
+
+    vector<string> path = astar(start, end);
+
+    return ASTAR_VISITED;
+}
+
 Node findNodeByID(const vector<Node> &nodes, const string &id)
 {
     for (const auto &n : nodes)
@@ -73,6 +85,7 @@ vector<string> astar(const string &start, const string &end)
             float newkc = rDist[nodeCurrent] + cost;
             if (newkc < rDist[neighbor])
             {
+                ASTAR_VISITED++;
                 rDist[neighbor] = newkc;
                 fDist[neighbor] = newkc + heuristic(findNodeByID(nodes, neighbor), findNodeByID(nodes, end));
                 prev[neighbor] = nodeCurrent;

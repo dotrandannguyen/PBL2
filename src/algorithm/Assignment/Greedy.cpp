@@ -111,7 +111,7 @@ void assignOrdersGreedy(vector<Drone> &drones, vector<Order> &orders, const vect
                 continue; // chỉ xét order chưa gán
 
             // path từ drone -> pickup
-            vector<string> path = astar(start, order.getPickupLocation());
+            vector<string> path = dijkstra(start, order.getPickupLocation());
             if (path.empty())
                 continue;
 
@@ -129,7 +129,7 @@ void assignOrdersGreedy(vector<Drone> &drones, vector<Order> &orders, const vect
 
             Order &o = orders[bestOrderIndex];
             // path pickup -> dropoff
-            vector<string> pickupToDrop = astar(o.getPickupLocation(), o.getDropoffLocation());
+            vector<string> pickupToDrop = dijkstra(o.getPickupLocation(), o.getDropoffLocation());
 
             // gop path
             vector<string> fullPath = bestPathToPickUp;

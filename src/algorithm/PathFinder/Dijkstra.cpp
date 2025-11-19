@@ -2,6 +2,8 @@
 
 using namespace std;
 
+int DIJKSTRA_VISITED;
+
 bool lineIntersectsCircle(float x1, float y1, float x2, float y2, float cx, float cy, float r)
 {
     float dx = x2 - x1;
@@ -24,6 +26,16 @@ bool lineIntersectsCircle(float x1, float y1, float x2, float y2, float cx, floa
 
     // kiểm tra điểm giao có nằm trên đoạn AB không
     return (t1 >= 0 && t1 <= 1) || (t2 >= 0 && t2 <= 1);
+}
+
+int dijkstraNodeVisited(const string &start, const string &end)
+{
+    // reset
+    DIJKSTRA_VISITED = 0;
+
+    vector<string> path = dijkstra(start, end);
+
+    return DIJKSTRA_VISITED;
 }
 
 AdjList buildAdjacencyList(const vector<Edge> &edges, const vector<NoFlyZone> &zones, const unordered_map<string, Node> &nodesMap)
@@ -80,7 +92,7 @@ vector<string> dijkstra(const string &start, const string &end)
     vector<Edge> edges = readEdgesFromFile("D:/Drone-project/src/data/Edge.txt");
     if (edges.empty())
     {
-        cerr << "Không thể đọc dữ liệu cạnh từ file.\n";
+        cerr << "Khong the doc du lieu cạnh từ file.\n";
         return {};
     }
 
@@ -88,7 +100,7 @@ vector<string> dijkstra(const string &start, const string &end)
     vector<Node> nodes = readNodesFromFile("D:/Drone-project/src/data/Node.txt");
     if (nodes.empty())
     {
-        cerr << "Không thể đọc dữ liệu node từ file.\n";
+        cerr << "Khong the doc du lieu node từ file.\n";
         return {};
     }
     for (const auto &n : nodes)
@@ -115,12 +127,14 @@ vector<string> dijkstra(const string &start, const string &end)
         float kc = top.first;
         string u = top.second;
         if (kc > dist[u])
-            continue;                  // da co duong ngan hon
+            continue; // da co duong ngan hon
+
         for (auto &[v, w] : adj.at(u)) // cách viết ngắn, tự tách pair<string,float> thành 2 biến
         {
             float newkc = kc + w;
             if (newkc < dist[v])
             {
+                DIJKSTRA_VISITED++;
                 dist[v] = newkc;
                 prev[v] = u;
                 pq.push({newkc, v});
