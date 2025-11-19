@@ -79,7 +79,7 @@ vector<int> hungarian(const vector<vector<float>> &costMatrix)
 void assignOrdersHungarian(vector<Drone> &drones,
                            vector<Order> &orders,
                            const vector<Node> &nodes,
-                           const vector<Edge> &edges)
+                           const vector<Edge> &edges, vector<Task> &tasks)
 {
     // cout << "[DEBUG HUNGARY] Hungary duoc goi" << endl;
     auto startTime = chrono::high_resolution_clock::now();
@@ -160,5 +160,7 @@ void assignOrdersHungarian(vector<Drone> &drones,
         hungaryTimes.push_back(duration);
         // cout << "[Hungarian] Drone " << droneIdx << " assigned to Order " << orderIdx
         //      << " in " << duration << " ms" << endl;
+        Task t = createTask(&d, &o, path1, path2, duration, edges, tasks.size());
+        tasks.push_back(t);
     }
 }

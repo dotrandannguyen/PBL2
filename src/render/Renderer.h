@@ -12,6 +12,7 @@
 #include "../core/Node.h"
 #include "../core/Order.h"
 #include "../core/Edge.h"
+#include "../core/Task.h"
 #include "Page/StatisticsPage.h"
 #include "../algorithm/PathFinder/AStar.h"
 #include "../algorithm/PathFinder/Dijkstra.h"
@@ -37,6 +38,7 @@ void runAlgorithms(const vector<Drone> &drones,
                    const vector<Order> &orders,
                    const vector<Node> &nodes,
                    const vector<Edge> &edges,
+                   const vector<Task> &tasks,
                    bool isAlgorithm);
 
 #endif

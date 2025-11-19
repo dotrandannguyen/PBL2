@@ -1,58 +1,89 @@
 #include "Task.h"
+#include <fstream>
+#include <sstream>
 
-Task::Task(string taskId, Drone *d, Order *o, string algo, float pathLen, float duration, string status)
-    : TaskID(taskId),
-      dronePtr(d),
-      orderPtr(o),
-      DroneID(d ? d->getDroneID() : ""),
-      OrderID(o ? o->getOrderID() : ""),
-      AlgorithmUsed(algo),
-      PathLength(pathLen),
-      Duration(duration),
-      Status(status) {}
-
-Task::Task(string taskId, string droneId, string orderId, string algo, float pathLen, float duration, string status)
-    : TaskID(taskId),
-      DroneID(droneId),
-      OrderID(orderId),
-      AlgorithmUsed(algo),
-      PathLength(pathLen),
-      Duration(duration),
-      Status(status),
-      dronePtr(nullptr),
-      orderPtr(nullptr) {}
+// Getters
+Task::Task(const string &id, Drone *d, Order *o,
+           const string &algo, float pathLen,
+           float dura, const string &s)
+    : TaskID(id), drone(d), order(o),
+      algorithmUsed(algo), pathLength(pathLen),
+      duration(dura), status(s) {}
 
 string Task::getTaskID() const { return TaskID; }
-string Task::getDroneID() const { return DroneID; }
-string Task::getOrderID() const { return OrderID; }
-string Task::getAlgorithmUsed() const { return AlgorithmUsed; }
-float Task::getPathLength() const { return PathLength; }
-float Task::getDuration() const { return Duration; }
-string Task::getStatus() const { return Status; }
+Drone *Task::getDrone() const { return drone; }
+Order *Task::getOrder() const { return order; }
+string Task::getAlgorithmUsed() const { return algorithmUsed; }
+float Task::getPathLength() const { return pathLength; }
+float Task::getDuration() const { return duration; }
+string Task::getStatus() const { return status; }
 
-void Task::setTaskID(const string &taskId) { TaskID = taskId; }
-void Task::setDroneID(const string &droneId) { DroneID = droneId; }
-void Task::setOrderID(const string &orderId) { OrderID = orderId; }
-void Task::setAlgorithmUsed(const string &algo) { AlgorithmUsed = algo; }
-void Task::setPathLength(float pathLen) { PathLength = pathLen; }
-void Task::setDuration(float duration) { Duration = duration; }
-void Task::setStatus(const string &status) { Status = status; }
+void Task::setTaskID(const string &id) { TaskID = id; }
+void Task::setDrone(Drone *d) { drone = d; }
+void Task::setOrder(Order *o) { order = o; }
+void Task::setAlgorithmUsed(const string &algo) { algorithmUsed = algo; }
+void Task::setPathLength(float pl) { pathLength = pl; }
+void Task::setDuration(float dur) { duration = dur; }
+void Task::setStatus(const string &stat) { status = stat; }
 
-vector<Task> readTasksFromFile(const string &filename)
+Task createTask(Drone *d, Order *o, const vector<string> &bestPathToPickUp,
+                const vector<string> &pickupToDrop,
+                float duration,
+                vector<Edge> edges,
+                int currentTaskCount)
+{
+    float dist1 = TotalPathDistance(bestPathToPickUp, edges);
+    float dist2 = TotalPathDistance(pickupToDrop, edges);
+
+    return Task(
+        "T" + to_string(currentTaskCount + 1), // ID
+        d,                                     // drone
+        o,                                     // order
+        "Greedy",                              // algorithm
+        dist1 + dist2,                         // path length
+        duration,                              // duration
+        "assigned"                             // status
+    );
+}
+
+vector<Task> readTasksFromFile(const string &filename,
+                               vector<Drone> &drones,
+                               vector<Order> &orders)
 {
     vector<Task> tasks;
     ifstream file(filename);
+
     if (!file.is_open())
     {
-        cout << "Khong the doc duoc file task: " << filename << endl;
+        cerr << "Khong the doc file: " << filename << endl;
         return tasks;
     }
 
-    string task_id, drone_id, order_id, algorithm, status;
-    float path_length, duration;
-    while (file >> task_id >> drone_id >> order_id >> algorithm >> path_length >> duration >> status)
+    string taskID, droneID, orderID, algo, status;
+    float pathLen, duration;
+
+    while (file >> taskID >> droneID >> orderID >> algo >> pathLen >> duration >> status)
     {
-        tasks.emplace_back(task_id, drone_id, order_id, algorithm, path_length, duration, status);
+        Task t;
+        t.setTaskID(taskID);
+        t.setAlgorithmUsed(algo);
+        t.setPathLength(pathLen);
+        t.setDuration(duration);
+        t.setStatus(status);
+
+        // gán drone*
+        t.setDrone(nullptr);
+        for (auto &d : drones)
+            if (d.getDroneID() == droneID)
+                t.setDrone(&d);
+
+        // gán order*
+        t.setOrder(nullptr);
+        for (auto &o : orders)
+            if (o.getOrderID() == orderID)
+                t.setOrder(&o);
+
+        tasks.push_back(t);
     }
 
     file.close();
@@ -64,44 +95,23 @@ void writeTasksToFile(const string &filename, const vector<Task> &tasks)
     ofstream file(filename);
     if (!file.is_open())
     {
-        cout << "Khong the ghi file: " << filename << endl;
+        cerr << "Khong the ghi file: " << filename << endl;
         return;
     }
 
     for (const auto &t : tasks)
     {
+        string droneID = t.getDrone() ? t.getDrone()->getDroneID() : "";
+        string orderID = t.getOrder() ? t.getOrder()->getOrderID() : "";
+
         file << t.getTaskID() << " "
-             << t.getDroneID() << " "
-             << t.getOrderID() << " "
+             << droneID << " "
+             << orderID << " "
              << t.getAlgorithmUsed() << " "
              << t.getPathLength() << " "
              << t.getDuration() << " "
              << t.getStatus() << "\n";
     }
+
     file.close();
-}
-
-// Liên kết lại con trỏ Task <-> Drone, Order sau khi đọc file
-void linkTasksWithPointers(vector<Task> &tasks, vector<Drone> &drones, vector<Order> &orders)
-{
-    for (auto &task : tasks)
-    {
-        for (auto &d : drones)
-        {
-            if (d.getDroneID() == task.getDroneID())
-            {
-                task.setDrone(&d);
-                break;
-            }
-        }
-
-        for (auto &o : orders)
-        {
-            if (o.getOrderID() == task.getOrderID())
-            {
-                task.setOrder(&o);
-                break;
-            }
-        }
-    }
 }

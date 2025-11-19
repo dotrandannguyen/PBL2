@@ -7,13 +7,12 @@
 #include "../../render/Page/HomePage.h"
 #include "../../render/Page/StatisticsPage.h"
 #include "../../utils/NoFLyZone.h"
+#include "../../utils/AdjList.h"
 #include <unordered_map>
 #include <queue>
 #include <vector>
 #include <string>
 #include <algorithm>
-
-using AdjList = unordered_map<string, vector<pair<string, float>>>; // canh ke co dang {N1, {N2, weight}}
 
 extern int DIJKSTRA_VISITED;
 

@@ -9,6 +9,7 @@
 #include "render/Renderer.h"
 #include "core/Drone.h"
 #include "core/Order.h"
+#include "core/Task.h"
 #include "render/Page/OrderPage.h"
 #include "render/Page/TaskPage.h"
 #include "render/Page/HomePage.h"
@@ -26,8 +27,7 @@ vector<Drone> drones = readDronesFromFile("D:/Drone-project/src/data/Drone.txt")
 vector<Node> nodes = readNodesFromFile("D:/Drone-project/src/data/Node.txt");
 vector<Edge> edges = readEdgesFromFile("D:/Drone-project/src/data/Edge.txt");
 vector<Order> orders = readOrdersFromFile("D:/Drone-project/src/data/Orders.txt");
-vector<Task> tasks = readTasksFromFile("D:/Drone-project/src/data/Task.txt");
-
+vector<Task> tasks = readTasksFromFile("D:/Drone-project/src/data/Task.txt", drones, orders);
 struct Button
 {
     SDL_Rect rect;
@@ -251,13 +251,6 @@ int main(int argc, char *argv[])
                 }
                 else if (currentPage == "Task")
                 {
-                    int winW, winH;
-                    SDL_GetRendererOutputSize(renderer, &winW, &winH);
-                    SDL_Rect addBtn = {winW - 140 - 30, 15, 140, 40};
-                    if (isMouseInside(addBtn, mx, my))
-                    {
-                        handleAddTask(tasks, drones, orders);
-                    }
                 }
             }
             else if (e.key.keysym.sym == SDLK_TAB)
@@ -274,15 +267,15 @@ int main(int argc, char *argv[])
                     isMoving = true;
                     hasStart = true;
 
-                    runAlgorithms(drones, orders, nodes, edges, isAlgorithm);
+                    runAlgorithms(drones, orders, nodes, edges, tasks, isAlgorithm);
                     //  Gọi Greedy assign Orders cho drones
                     if (isAlgorithm)
                     {
-                        assignOrdersGreedy(drones, orders, nodes, edges);
+                        assignOrdersGreedy(drones, orders, nodes, edges, tasks);
                     }
                     else
                     {
-                        assignOrdersHungarian(drones, orders, nodes, edges);
+                        assignOrdersHungarian(drones, orders, nodes, edges, tasks);
                     }
 
                     logMessage("[DEBUG] assignOrdersGreedy trong while duoc goi!");
@@ -311,12 +304,12 @@ int main(int argc, char *argv[])
 
                     {
                         cout << "[DEBUG] assignOrdersGreedy trong newOrder duoc goi!" << endl;
-                        assignOrdersGreedy(drones, orders, nodes, edges);
+                        assignOrdersGreedy(drones, orders, nodes, edges, tasks);
                     }
                     else
                     {
                         cout << "[DEBUG] assignOrdersHungary trong newOrder duoc goi!" << endl;
-                        assignOrdersHungarian(drones, orders, nodes, edges);
+                        assignOrdersHungarian(drones, orders, nodes, edges, tasks);
                     }
 
                     isMoving = true;
@@ -416,11 +409,11 @@ int main(int argc, char *argv[])
                     logMessage("[DEBUG] assignOrdersGreedy trong Finished duoc goi!");
                     if (isAlgorithm)
                     {
-                        assignOrdersGreedy(drones, orders, nodes, edges);
+                        assignOrdersGreedy(drones, orders, nodes, edges, tasks);
                     }
                     else
                     {
-                        assignOrdersHungarian(drones, orders, nodes, edges);
+                        assignOrdersHungarian(drones, orders, nodes, edges, tasks);
                     }
                 }
             }

@@ -45,31 +45,6 @@ void snapDroneToNode(Drone &d, const vector<Node> &nodes)
     }
 }
 
-float TotalPathDistance(const vector<string> &path, const vector<Edge> &edges)
-{
-    if (path.size() < 2)
-        return 0.0f; //  nếu path chỉ 1 node hoặc rỗng => không có cạnh => dist = 0
-
-    float total = 0.0f;
-
-    for (size_t i = 0; i + 1 < path.size(); i++)
-    {
-        const string &a = path[i];
-        const string &b = path[i + 1];
-
-        for (const auto &e : edges)
-        {
-            if ((e.getStartNode() == a && e.getEndNode() == b) ||
-                (e.getStartNode() == b && e.getEndNode() == a))
-            {
-                total += e.getDistance(); // cộng trọng số cạnh
-                break;                    // tìm thấy cạnh tương ứng => thoát vòng edges
-            }
-        }
-    }
-    return total;
-}
-
 vector<Node> convertPathToNodes(const vector<string> &pathIDs, const vector<Node> &nodes)
 {
     vector<Node> result;
@@ -88,7 +63,7 @@ vector<Node> convertPathToNodes(const vector<string> &pathIDs, const vector<Node
     return result;
 }
 
-void assignOrdersGreedy(vector<Drone> &drones, vector<Order> &orders, const vector<Node> &nodes, const vector<Edge> &edges)
+void assignOrdersGreedy(vector<Drone> &drones, vector<Order> &orders, const vector<Node> &nodes, const vector<Edge> &edges, vector<Task> &tasks)
 {
     // với mỗi drone rảnh, tìm order pending gần nhất
     // cout << "[DEBUG GREEDY] GREEDY duoc goi" << endl;
@@ -148,6 +123,9 @@ void assignOrdersGreedy(vector<Drone> &drones, vector<Order> &orders, const vect
             greedyTimes.push_back(duration);
             // cout << "[Greedy] Drone " << i << " assigned to Order " << o.getOrderID()
             //      << " in " << duration << " ms" << endl;
+
+            Task t = createTask(&d, &o, bestPathToPickUp, pickupToDrop, duration, edges, tasks.size());
+            tasks.push_back(t);
         }
     }
 }

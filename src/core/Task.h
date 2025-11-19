@@ -1,68 +1,55 @@
 #ifndef TASK_H
 #define TASK_H
-
+#include <iostream>
+#include <string>
 #include "Drone.h"
 #include "Order.h"
-#include <string>
-#include <iostream>
-#include <vector>
-#include <fstream>
+#include "Edge.h"
+#include "../utils/pathUtils.h"
+#include "../utils/AdjList.h"
+
 using namespace std;
 
 class Task
 {
 private:
-    Drone *dronePtr = nullptr;
-    Order *orderPtr = nullptr;
     string TaskID;
-    string DroneID;       // ref Drone.DroneID
-    string OrderID;       // ref Order.OrderID
-    string AlgorithmUsed; // AStar | Dijkstra
-    float PathLength;
-    float Duration;
-    string Status; // assigned | completed
+    Drone *drone;
+    Order *order;
+    string algorithmUsed;
+    float pathLength;
+    float duration;
+    string status;
 
 public:
-    Task() = default;
-
-    Task(string taskId, Drone *d, Order *o, string algo, float pathLen, float duration, string status);
-    // Constructor đọc file (chỉ lưu ID, chưa có con trỏ)
-    Task(string taskId, string droneId, string orderId, string algo, float pathLen, float duration, string status);
-    // Getter
-    Drone *getDrone() const { return dronePtr; }
-    Order *getOrder() const { return orderPtr; }
+    Task(const string &id = "", Drone *d = nullptr, Order *o = nullptr, const string &algo = "", float pathLen = 0.0f, float dura = 0.0f, const string &s = "");
+    // getter
     string getTaskID() const;
-    string getDroneID() const;
-    string getOrderID() const;
+    Drone *getDrone() const;
+    Order *getOrder() const;
     string getAlgorithmUsed() const;
     float getPathLength() const;
     float getDuration() const;
     string getStatus() const;
 
-    // Setter
-    void setDrone(Drone *d)
-    {
-        dronePtr = d;
-        if (d)
-            DroneID = d->getDroneID();
-    }
-    void setOrder(Order *o)
-    {
-        orderPtr = o;
-        if (o)
-            OrderID = o->getOrderID();
-    }
-    void setTaskID(const string &taskId);
-    void setDroneID(const string &droneId);
-    void setOrderID(const string &orderId);
+    // setter
+    void setTaskID(const string &id);
+    void setDrone(Drone *d);
+    void setOrder(Order *o);
     void setAlgorithmUsed(const string &algo);
-    void setPathLength(float pathLen);
+    void setPathLength(float pathLength);
     void setDuration(float duration);
     void setStatus(const string &status);
 };
 
-vector<Task> readTasksFromFile(const string &filename);
-void writeTasksToFile(const string &filename, const vector<Task> &Tasks);
-void linkTasksWithPointers(vector<Task> &tasks, vector<Drone> &drones, vector<Order> &orders);
+Task createTask(Drone *d, Order *o, const vector<string> &bestPathToPickUp,
+                const vector<string> &pickupToDrop,
+                float duration,
+                vector<Edge> edges,
+                int currentTaskCount);
 
+vector<Task> readTasksFromFile(const string &filename,
+                               vector<Drone> &drones,
+                               vector<Order> &orders);
+void writeTasksToFile(const string &filename, const vector<Task> &tasks);
 #endif

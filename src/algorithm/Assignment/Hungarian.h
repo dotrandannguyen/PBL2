@@ -8,6 +8,7 @@
 #include "../../core/Order.h"
 #include "../../core/Node.h"
 #include "../../core/Edge.h"
+#include "../../core/Task.h"
 #include "../PathFinder/AStar.h"
 #include "../PathFinder/Dijkstra.h"
 #include "Greedy.h"                           // Dùng lại các hàm findClosestNodeID, TotalPathDistance, convertPathToNodes
@@ -20,6 +21,6 @@ using namespace std;
 
 vector<int> hungarian(const vector<vector<float>> &costMatrix);
 
-void assignOrdersHungarian(vector<Drone> &drones, vector<Order> &orders, const vector<Node> &nodes, const vector<Edge> &edges);
+void assignOrdersHungarian(vector<Drone> &drones, vector<Order> &orders, const vector<Node> &nodes, const vector<Edge> &edges, vector<Task> &tasks);
 
 #endif

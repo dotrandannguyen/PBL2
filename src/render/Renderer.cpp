@@ -54,6 +54,7 @@ void runAlgorithms(const vector<Drone> &drones,
                    const vector<Order> &orders,
                    const vector<Node> &nodes,
                    const vector<Edge> &edges,
+                   const vector<Task> &tasks,
                    bool isAlgorithm)
 {
     // Snapshot dữ liệu gốc
@@ -61,13 +62,13 @@ void runAlgorithms(const vector<Drone> &drones,
     vector<Order> o1 = orders, o2 = orders, o3 = orders;
     vector<Node> n1 = nodes, n2 = nodes;
     vector<Edge> e1 = edges, e2 = edges;
-
+    vector<Task> t1 = tasks, t2 = tasks;
     if (isAlgorithm)
     {
 
         // Chạy Hungarian
 
-        assignOrdersHungarian(d2, o2, n2, e2);
+        assignOrdersHungarian(d2, o2, n2, e2, t2);
 
         // cout << "[INFO] Hungary (ngam) hoat dong" << endl;
     }
@@ -76,7 +77,7 @@ void runAlgorithms(const vector<Drone> &drones,
 
         // Chạy Greedy
 
-        assignOrdersGreedy(d1, o1, n1, e1);
+        assignOrdersGreedy(d1, o1, n1, e1, t1);
         // cout << "[INFO] Greedy (ngam) hoat dong" << endl;
     }
 
