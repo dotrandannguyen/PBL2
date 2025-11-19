@@ -27,7 +27,7 @@ vector<Drone> drones = readDronesFromFile("D:/Drone-project/src/data/Drone.txt")
 vector<Node> nodes = readNodesFromFile("D:/Drone-project/src/data/Node.txt");
 vector<Edge> edges = readEdgesFromFile("D:/Drone-project/src/data/Edge.txt");
 vector<Order> orders = readOrdersFromFile("D:/Drone-project/src/data/Orders.txt");
-vector<Task> tasks = readTasksFromFile("D:/Drone-project/src/data/Task.txt", drones, orders);
+vector<Task> tasks;
 struct Button
 {
     SDL_Rect rect;
@@ -251,6 +251,18 @@ int main(int argc, char *argv[])
                 }
                 else if (currentPage == "Task")
                 {
+                    SDL_Point mousePoint = {mx, my};
+                    if (SDL_PointInRect(&mousePoint, &pageTaskButtons.prevBtn))
+                    {
+                        if (currentTaskPage > 0)
+                            currentTaskPage--;
+                    }
+                    else if (SDL_PointInRect(&mousePoint, &pageTaskButtons.nextBtn))
+                    {
+                        int totalPages = (tasks.size() + TASKS_PER_PAGE - 1) / TASKS_PER_PAGE;
+                        if (currentTaskPage < totalPages - 1)
+                            currentTaskPage++;
+                    }
                 }
             }
             else if (e.key.keysym.sym == SDLK_TAB)
