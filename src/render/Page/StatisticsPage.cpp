@@ -29,7 +29,7 @@ void drawGraph(SDL_Renderer *renderer, TTF_Font *font, graphBoxes gB)
     //
     int margin = 80;
     int graphLeft = gB.boxes.x + margin;
-    int graphRight = gB.boxes.x + gB.boxes.w - margin;
+    int graphRight = gB.boxes.x + gB.boxes.w - margin + 30;
     int graphTop = gB.boxes.y + margin;
     int graphBottom = gB.boxes.y + gB.boxes.h - margin;
 
@@ -163,41 +163,25 @@ void renderStatisticsPage(SDL_Renderer *renderer, TTF_Font *font, int startX)
     // giới hạn vùng nội dung
     int contentLeft = startX + 40;
     int contentRight = winW - 40;
-    int contentTop = 100;
+    int contentTop = 200;
     int contentBottom = winH - 40;
 
-    int contentWidth = contentRight - contentLeft;
-    int contentHeight = contentBottom - contentTop;
+    int contentWidth = (contentRight - contentLeft) / 2;
+    int contentHeight = (contentBottom - contentTop) / 2 + 60;
 
-    // chia 4 luoi
-    int cellW = contentWidth / 2 - 40;
-    int cellH = contentHeight / 2 - 40;
-
-    vector<float> fakeLine1 = {100, 200, 240, 250};
-    vector<float> fakeLine2 = {50, 100, 200, 240};
-
-    SDL_Rect boxes[4];
-    boxes[0] = {contentLeft, contentTop, cellW, cellH};
+    SDL_Rect boxes[2];
+    boxes[0] = {contentLeft, contentTop, contentWidth, contentHeight};
     vector<string> se;
     se.push_back("Greedy");
     se.push_back("Hungary");
     gBox.push_back({boxes[0], se, greedyTimes, hungaryTimes});
 
-    boxes[1] = {contentLeft + cellW + 20, contentTop, cellW, cellH};
+    boxes[1] = {contentLeft + contentWidth + 20, contentTop, contentWidth, contentHeight};
     se.clear();
     se.push_back("Astar");
     se.push_back("Dijkstra");
     gBox.push_back({boxes[1], se, astarVisited, dijkstraVisited});
-    boxes[2] = {contentLeft, contentTop + cellH + 20, cellW, cellH};
-    se.clear();
-    se.push_back("Orders");
-    se.push_back("Drones");
-    gBox.push_back({boxes[2], se, fakeLine1, fakeLine2});
-    boxes[3] = {contentLeft + cellW + 20, contentTop + cellH + 20, cellW, cellH};
-    se.clear();
-    se.push_back("Time");
-    se.push_back("Quantities");
-    gBox.push_back({boxes[3], se, fakeLine1, fakeLine2});
+
     SDL_SetRenderDrawColor(renderer, 0, 0, 0, 255);
 
     for (auto &b : boxes)
@@ -208,6 +192,15 @@ void renderStatisticsPage(SDL_Renderer *renderer, TTF_Font *font, int startX)
     {
         drawGraph(renderer, font, b);
     }
+
+    // chu thich
+    int textW, textH;
+    string k = "DO THI BIEU THI THOI GIAN  CUA 2 THUAT TOAN GREEDY VA HUNGARY";
+    string m = "DO THI BIEU THI SO NODE DA THAM CUA 2 THUAT TOAN ASTAR VA DIJKSTRA";
+    TTF_SizeText(font, m.c_str(), &textW, &textH);
+
+    renderText(renderer, font, k, boxes[0].x + (boxes[0].w - textW) / 2, boxes[0].y + 220 + (boxes[0].h - textH) / 2, {0, 0, 0, 255});
+    renderText(renderer, font, m, boxes[1].x + (boxes[0].w - textW) / 2, boxes[1].y + 220 + (boxes[1].h - textH) / 2, {0, 0, 0, 255});
 }
 
 // 1536 8641536
